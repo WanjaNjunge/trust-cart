@@ -1,0 +1,202 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches: [develop, 'feature/**', 'bugfix/**']
+  pull_request:
+    branches: [develop, main]
+
+env:
+  NODE_VERSION: '20'
+  PNPM_VERSION: '8'
+
+jobs:
+  lint:
+    name: Lint & Type Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Type Check
+        run: pnpm type-check
+
+  test-api:
+    name: Test Backend
+    runs-on: ubuntu-latest
+    needs: lint
+
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_USER: test
+          POSTGRES_PASSWORD: test
+          POSTGRES_DB: trustcart_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate Prisma Client
+        run: pnpm --filter api prisma generate
+
+      - name: Run Migrations
+        run: pnpm --filter api prisma migrate deploy
+        env:
+          DATABASE_URL: postgresql://test:test@localhost:5432/trustcart_test
+
+      - name: Run Tests
+        run: pnpm --filter api test:cov
+        env:
+          DATABASE_URL: postgresql://test:test@localhost:5432/trustcart_test
+          REDIS_HOST: localhost
+          REDIS_PORT: 6379
+          JWT_SECRET: test-secret-key
+
+      - name: Upload Coverage
+        uses: codecov/codecov-action@v3
+        with:
+          files: apps/api/coverage/lcov.info
+          flags: backend
+          fail_ci_if_error: false
+
+  test-web:
+    name: Test Frontend
+    runs-on: ubuntu-latest
+    needs: lint
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run Tests
+        run: pnpm --filter web test:cov
+
+      - name: Upload Coverage
+        uses: codecov/codecov-action@v3
+        with:
+          files: apps/web/coverage/lcov.info
+          flags: frontend
+          fail_ci_if_error: false
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    needs: [test-api, test-web]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build Shared Package
+        run: pnpm --filter @trustcart/shared build
+
+      - name: Generate Prisma Client
+        run: pnpm --filter api prisma generate
+
+      - name: Build API
+        run: pnpm --filter api build
+
+      - name: Build Web
+        run: pnpm --filter web build
+
+      # Artifacts for potential future deployment
+      # - name: Upload API Artifact
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: api-build
+      #     path: apps/api/dist
+
+      # - name: Upload Web Artifact
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: web-build
+      #     path: apps/web/.next
+
+  # Placeholder for future deployment stages
+  # deploy-dev:
+  #   name: Deploy to Dev
+  #   needs: build
+  #   if: github.ref == 'refs/heads/develop'
+  #   runs-on: ubuntu-latest
+  #   environment: development
+  #   steps:
+  #     - name: Deploy
+  #       run: echo "Deployment placeholder"

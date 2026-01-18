@@ -1,0 +1,57 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  // URL is now configured in prisma.config.ts (Prisma 7.x)
+}
+
+// ===========================================
+// User Domain
+// ===========================================
+
+model User {
+  id             String    @id @default(cuid())
+  email          String    @unique
+  passwordHash   String    @map("password_hash")
+  firstName      String    @map("first_name")
+  lastName       String    @map("last_name")
+  phone          String?
+  role           UserRole  @default(CUSTOMER)
+  isActive       Boolean   @default(true) @map("is_active")
+  emailVerified  Boolean   @default(false) @map("email_verified")
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
+
+  // Relations will be added as domains are implemented
+  // addresses      Address[]
+  // orders         Order[]
+  // reviews        Review[]
+  // carts          Cart[]
+
+  @@map("users")
+}
+
+enum UserRole {
+  CUSTOMER
+  STAFF
+  MANAGER
+  ADMIN
+}
+
+// ===========================================
+// Additional models will be added as domains
+// are implemented in later phases:
+// - Product, Category, Brand
+// - Inventory, Reservation
+// - Cart, CartItem
+// - Order, OrderItem, OrderStatusHistory
+// - PaymentTransaction, MpesaTransaction
+// - Delivery, DeliveryEvent
+// - PromoCode, PromoUsage
+// - Review
+// ===========================================
