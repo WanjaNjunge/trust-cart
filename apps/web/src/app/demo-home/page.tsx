@@ -34,7 +34,7 @@ const FEATURED_PRODUCTS: FeaturedProduct[] = [
     name: 'MacBook Air M2',
     tagline: 'Supercharged by Apple Silicon',
     price: 'KES 149,990',
-    image: `${IMAGEKIT_BASE}/products/macbook-air-m2.png`,
+    image: `${IMAGEKIT_BASE}/products/macbook-air-m2.png?v=2`,
     gradient: 'from-blue-600 to-indigo-900',
     glow: 'rgba(59, 130, 246, 0.4)',
     href: '/products/macbook-air-m2',
@@ -44,7 +44,7 @@ const FEATURED_PRODUCTS: FeaturedProduct[] = [
     name: 'iPhone 15',
     tagline: 'Dynamic Island. All new design.',
     price: 'KES 134,990',
-    image: `${IMAGEKIT_BASE}/products/iphone-15.png`,
+    image: `${IMAGEKIT_BASE}/products/iphone-15.png?v=3`,
     gradient: 'from-purple-600 to-pink-900',
     glow: 'rgba(168, 85, 247, 0.4)',
     href: '/products/iphone-15-128gb',
@@ -54,7 +54,7 @@ const FEATURED_PRODUCTS: FeaturedProduct[] = [
     name: 'Galaxy S24 Ultra',
     tagline: 'The ultimate Galaxy experience',
     price: 'KES 179,990',
-    image: `${IMAGEKIT_BASE}/products/samsung-s24-ultra.png`,
+    image: `${IMAGEKIT_BASE}/products/samsung-s24-ultra.png?v=3`,
     gradient: 'from-emerald-600 to-teal-900',
     glow: 'rgba(16, 185, 129, 0.4)',
     href: '/products/samsung-galaxy-s24-ultra',
@@ -242,26 +242,16 @@ function HeroSection() {
             />
 
             {/* Circular Product Container */}
-            {/* Circular Product Container */}
             <div className="relative h-[320px] w-[320px] md:h-[420px] md:w-[420px]">
               {/* Outer glow ring */}
               <div
                 className={`absolute inset-0 rounded-full bg-gradient-to-br ${product.gradient} opacity-20 blur-xl`}
               />
 
-              {/* Main circular container - The "Compositing Stack" */}
-              <div
-                className="absolute inset-4 overflow-hidden rounded-full border border-white/10 bg-black"
-                style={{
-                  maskImage: 'radial-gradient(circle at center, black 60%, transparent 95%)',
-                  WebkitMaskImage: 'radial-gradient(circle at center, black 60%, transparent 95%)',
-                }}
-              >
-                {/* Inner gradient overlay for depth and color tint */}
-                <div
-                  className={`absolute inset-0 bg-gradient-to-br ${product.gradient} opacity-10`}
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-white/5" />
+              {/* Main circular container */}
+              <div className="absolute inset-4 overflow-hidden rounded-full border border-white/10 bg-gradient-to-br from-zinc-900/80 to-black/60 backdrop-blur-sm">
+                {/* Inner gradient overlay for depth */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-white/5" />
 
                 {/* Product Image */}
                 <AnimatePresence mode="wait">
@@ -284,7 +274,7 @@ function HeroSection() {
                           alt={product.name}
                           fill
                           sizes="(max-width: 768px) 280px, 380px"
-                          className="mix-blend-screen object-contain drop-shadow-[0_20px_50px_rgba(0,0,0,0.5)]"
+                          className="object-contain drop-shadow-[0_20px_50px_rgba(0,0,0,0.5)]"
                           priority
                         />
                       </div>
