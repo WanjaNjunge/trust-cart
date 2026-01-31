@@ -1,23 +1,31 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-    // Strict mode for better development experience
-    reactStrictMode: true,
+  // Strict mode for better development experience
+  reactStrictMode: true,
 
-    // Image optimization
-    images: {
-        remotePatterns: [
-            {
-                protocol: 'https',
-                hostname: '**.trustcart.co.ke',
-            },
-        ],
-    },
+  // Image optimization
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: '**.trustcart.co.ke',
+      },
+      {
+        protocol: 'https',
+        hostname: 'placehold.co',
+      },
+      {
+        protocol: 'https',
+        hostname: 'ik.imagekit.io',
+      },
+    ],
+  },
 
-    // Environment variables exposed to browser
-    env: {
-        NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
-        NEXT_PUBLIC_SITE_NAME: process.env.NEXT_PUBLIC_SITE_NAME,
-    },
+  // Environment variables exposed to browser
+  env: {
+    NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
+    NEXT_PUBLIC_SITE_NAME: process.env.NEXT_PUBLIC_SITE_NAME,
+  },
 };
 
 module.exports = nextConfig;

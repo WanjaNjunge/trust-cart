@@ -1,5 +1,5 @@
 /**
  * Auth guards
- * Add custom guards here (e.g., JwtAuthGuard, RolesGuard)
  */
-export { };
+export * from './jwt-auth.guard';
+export * from './roles.guard';

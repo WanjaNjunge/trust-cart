@@ -10,7 +10,7 @@
 
 **TrustCart Kenya**
 
-*Rationale:* The name signals reliability ("Trust") and shopping ("Cart"), directly addressing the core differentiator in a market where customer confidence is the primary barrier to online purchasing.
+_Rationale:_ The name signals reliability ("Trust") and shopping ("Cart"), directly addressing the core differentiator in a market where customer confidence is the primary barrier to online purchasing.
 
 ---
 
@@ -49,13 +49,13 @@ The platform sells curated, quality-verified electronics with honest product des
 
 ## 4. Core Problems We Are Solving
 
-| # | Problem | Context |
-|---|---------|---------|
-| 1 | **Trust deficit in online purchases** | Many Kenyan e-commerce sites have poor reputations — customers pay and receive nothing, or receive counterfeit goods. There is no reliable recourse. |
-| 2 | **Payment friction** | MPesa is dominant, but many sites handle it poorly — unclear confirmation, failed callbacks, no receipts. Customers are left wondering if payment went through. |
-| 3 | **Delivery uncertainty** | Customers don't know when or if items will arrive. Tracking is often unavailable or unreliable. Failed deliveries result in lost goods or lengthy disputes. |
-| 4 | **Product misrepresentation** | "New" products turn out to be refurbished. Specifications are inaccurate. Photos don't match items received. |
-| 5 | **No accountability** | When problems occur, there is no clear complaint process, no refund path, and customer service is unresponsive. |
+| #   | Problem                               | Context                                                                                                                                                         |
+| --- | ------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | **Trust deficit in online purchases** | Many Kenyan e-commerce sites have poor reputations — customers pay and receive nothing, or receive counterfeit goods. There is no reliable recourse.            |
+| 2   | **Payment friction**                  | MPesa is dominant, but many sites handle it poorly — unclear confirmation, failed callbacks, no receipts. Customers are left wondering if payment went through. |
+| 3   | **Delivery uncertainty**              | Customers don't know when or if items will arrive. Tracking is often unavailable or unreliable. Failed deliveries result in lost goods or lengthy disputes.     |
+| 4   | **Product misrepresentation**         | "New" products turn out to be refurbished. Specifications are inaccurate. Photos don't match items received.                                                    |
+| 5   | **No accountability**                 | When problems occur, there is no clear complaint process, no refund path, and customer service is unresponsive.                                                 |
 
 ---
 
@@ -174,17 +174,17 @@ The following features are **intentionally excluded** from MVP and planned for l
 
 The following are **explicitly not** goals for this product, and should not influence MVP decisions:
 
-| Non-Goal | Rationale |
-|----------|-----------|
-| **Marketplace / multi-seller model** | Introduces trust complexity. We control inventory in v1 to guarantee quality. |
-| **International shipping** | Focus is Kenya-only. Cross-border logistics is a separate problem. |
-| **Mobile applications** | Web-first. Responsive design serves mobile users adequately for MVP. |
-| **Auction or bidding features** | Fixed pricing only. Auctions add complexity and user confusion. |
-| **Cryptocurrency payments** | Not a customer need in target market. Adds regulatory and operational risk. |
-| **Social features** | No user-generated content, forums, or social sharing in v1. |
-| **Comparison shopping tools** | We sell our own inventory, not aggregating from competitors. |
-| **Real-time chat support** | Email/phone support is sufficient for MVP. Live chat adds operational burden. |
-| **Advanced personalization / AI recommendations** | Premature optimization. Focus on core catalog and search first. |
+| Non-Goal                                          | Rationale                                                                     |
+| ------------------------------------------------- | ----------------------------------------------------------------------------- |
+| **Marketplace / multi-seller model**              | Introduces trust complexity. We control inventory in v1 to guarantee quality. |
+| **International shipping**                        | Focus is Kenya-only. Cross-border logistics is a separate problem.            |
+| **Mobile applications**                           | Web-first. Responsive design serves mobile users adequately for MVP.          |
+| **Auction or bidding features**                   | Fixed pricing only. Auctions add complexity and user confusion.               |
+| **Cryptocurrency payments**                       | Not a customer need in target market. Adds regulatory and operational risk.   |
+| **Social features**                               | No user-generated content, forums, or social sharing in v1.                   |
+| **Comparison shopping tools**                     | We sell our own inventory, not aggregating from competitors.                  |
+| **Real-time chat support**                        | Email/phone support is sufficient for MVP. Live chat adds operational burden. |
+| **Advanced personalization / AI recommendations** | Premature optimization. Focus on core catalog and search first.               |
 
 ---
 
@@ -226,9 +226,9 @@ The MVP will be considered successful if the following outcomes are achieved wit
 
 > [!IMPORTANT]
 > **Stated Assumptions**
-> 
+>
 > The following assumptions were made in drafting this document and require confirmation:
-> 
+>
 > 1. **Inventory model:** The business controls its own inventory (not a marketplace). Products are purchased wholesale or on consignment and stored before sale.
 > 2. **Geographic scope:** Initial operations are limited to Kenya, with primary focus on Nairobi and surrounding areas for delivery.
 > 3. **Payment landscape:** MPesa is the dominant payment method. Card payments are lower priority for the target customer segment.
@@ -239,12 +239,12 @@ The MVP will be considered successful if the following outcomes are achieved wit
 
 ## Document Approval
 
-| Role | Name | Status | Date |
-|------|------|--------|------|
-| Product Owner | — | Pending | — |
-| Technical Lead | — | Pending | — |
-| Business Stakeholder | — | Pending | — |
+| Role                 | Name | Status  | Date |
+| -------------------- | ---- | ------- | ---- |
+| Product Owner        | —    | Pending | —    |
+| Technical Lead       | —    | Pending | —    |
+| Business Stakeholder | —    | Pending | —    |
 
 ---
 
-*This document serves as a source of truth for MVP scope. Any feature not explicitly included in Section 6 requires explicit approval before implementation.*
+_This document serves as a source of truth for MVP scope. Any feature not explicitly included in Section 6 requires explicit approval before implementation._

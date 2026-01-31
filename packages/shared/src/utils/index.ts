@@ -10,7 +10,7 @@ import { CURRENCY, VAT_RATE } from '../constants';
  * @returns Formatted string e.g., "KES 45,990"
  */
 export function formatCurrency(amount: number): string {
-    return `${CURRENCY.SYMBOL} ${amount.toLocaleString('en-KE')}`;
+  return `${CURRENCY.SYMBOL} ${amount.toLocaleString('en-KE')}`;
 }
 
 /**
@@ -20,7 +20,7 @@ export function formatCurrency(amount: number): string {
  * @returns The VAT component
  */
 export function calculateVat(inclusivePrice: number): number {
-    return Math.round(inclusivePrice * (VAT_RATE / (1 + VAT_RATE)));
+  return Math.round(inclusivePrice * (VAT_RATE / (1 + VAT_RATE)));
 }
 
 /**
@@ -29,7 +29,7 @@ export function calculateVat(inclusivePrice: number): number {
  * @returns The price excluding VAT
  */
 export function priceExcludingVat(inclusivePrice: number): number {
-    return inclusivePrice - calculateVat(inclusivePrice);
+  return inclusivePrice - calculateVat(inclusivePrice);
 }
 
 /**
@@ -39,9 +39,9 @@ export function priceExcludingVat(inclusivePrice: number): number {
  * @returns True if valid Kenyan phone number
  */
 export function isValidKenyanPhone(phone: string): boolean {
-    const cleaned = phone.replace(/\s+/g, '');
-    const regex = /^(?:\+?254|0)?[17]\d{8}$/;
-    return regex.test(cleaned);
+  const cleaned = phone.replace(/\s+/g, '');
+  const regex = /^(?:\+?254|0)?[17]\d{8}$/;
+  return regex.test(cleaned);
 }
 
 /**
@@ -50,21 +50,21 @@ export function isValidKenyanPhone(phone: string): boolean {
  * @returns Normalized phone number or null if invalid
  */
 export function normalizeKenyanPhone(phone: string): string | null {
-    if (!isValidKenyanPhone(phone)) {
-        return null;
-    }
+  if (!isValidKenyanPhone(phone)) {
+    return null;
+  }
 
-    const cleaned = phone.replace(/\s+/g, '').replace(/^\+/, '');
+  const cleaned = phone.replace(/\s+/g, '').replace(/^\+/, '');
 
-    if (cleaned.startsWith('0')) {
-        return '254' + cleaned.slice(1);
-    }
+  if (cleaned.startsWith('0')) {
+    return '254' + cleaned.slice(1);
+  }
 
-    if (cleaned.startsWith('254')) {
-        return cleaned;
-    }
+  if (cleaned.startsWith('254')) {
+    return cleaned;
+  }
 
-    return '254' + cleaned;
+  return '254' + cleaned;
 }
 
 /**
@@ -72,14 +72,14 @@ export function normalizeKenyanPhone(phone: string): string | null {
  * john.doe@example.com → j***e@example.com
  */
 export function maskEmail(email: string): string {
-    const [local, domain] = email.split('@');
-    if (!local || !domain) return '***@***';
+  const [local, domain] = email.split('@');
+  if (!local || !domain) return '***@***';
 
-    if (local.length <= 2) {
-        return `${local[0]}***@${domain}`;
-    }
+  if (local.length <= 2) {
+    return `${local[0]}***@${domain}`;
+  }
 
-    return `${local[0]}***${local[local.length - 1]}@${domain}`;
+  return `${local[0]}***${local[local.length - 1]}@${domain}`;
 }
 
 /**
@@ -87,6 +87,6 @@ export function maskEmail(email: string): string {
  * 254712345678 → 2547***5678
  */
 export function maskPhone(phone: string): string {
-    if (phone.length < 8) return '***';
-    return phone.slice(0, 4) + '***' + phone.slice(-4);
+  if (phone.length < 8) return '***';
+  return phone.slice(0, 4) + '***' + phone.slice(-4);
 }

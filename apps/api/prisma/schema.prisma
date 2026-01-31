@@ -1,5 +1,7 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
+// ===========================================
+// TrustCart Kenya - Prisma Schema
+// Phase 7: Complete Domain Model
+// ===========================================
 
 generator client {
   provider = "prisma-client-js"
@@ -7,34 +9,12 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  // URL is now configured in prisma.config.ts (Prisma 7.x)
+  url      = env("DATABASE_URL")
 }
 
 // ===========================================
-// User Domain
+// ENUMS
 // ===========================================
-
-model User {
-  id             String    @id @default(cuid())
-  email          String    @unique
-  passwordHash   String    @map("password_hash")
-  firstName      String    @map("first_name")
-  lastName       String    @map("last_name")
-  phone          String?
-  role           UserRole  @default(CUSTOMER)
-  isActive       Boolean   @default(true) @map("is_active")
-  emailVerified  Boolean   @default(false) @map("email_verified")
-  createdAt      DateTime  @default(now()) @map("created_at")
-  updatedAt      DateTime  @updatedAt @map("updated_at")
-
-  // Relations will be added as domains are implemented
-  // addresses      Address[]
-  // orders         Order[]
-  // reviews        Review[]
-  // carts          Cart[]
-
-  @@map("users")
-}
 
 enum UserRole {
   CUSTOMER
@@ -43,15 +23,724 @@ enum UserRole {
   ADMIN
 }
 
+enum ProductCondition {
+  BRAND_NEW
+  OPEN_BOX
+  CERTIFIED_REFURBISHED
+  EX_UK
+  EX_USA
+}
+
+enum OrderStatus {
+  CREATED
+  PENDING_PAYMENT
+  PAYMENT_FAILED
+  CONFIRMED
+  PROCESSING
+  READY_FOR_PICKUP
+  DISPATCHED
+  OUT_FOR_DELIVERY
+  DELIVERED
+  DELIVERY_FAILED
+  RETURN_REQUESTED
+  RETURN_APPROVED
+  RETURN_REJECTED
+  RETURN_RECEIVED
+  REFUND_PENDING
+  REFUNDED
+  PARTIAL_REFUND
+  COMPLETED
+  CANCELLED
+  EXPIRED
+}
+
+enum PaymentMethod {
+  MPESA_STK
+  MPESA_PAYBILL
+  POD_CASH
+}
+
+enum PaymentStatus {
+  INITIATED
+  PENDING
+  CONFIRMED
+  FAILED
+  CANCELLED
+  REFUNDED
+}
+
+enum RefundStatus {
+  PENDING
+  APPROVED
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+enum DeliveryZone {
+  ZONE_1
+  ZONE_2
+  ZONE_3
+  ZONE_4
+}
+
+enum DeliveryStatus {
+  PENDING
+  ASSIGNED
+  DISPATCHED
+  IN_TRANSIT
+  OUT_FOR_DELIVERY
+  DELIVERED
+  FAILED
+  RETURNED_TO_SENDER
+}
+
+enum DiscountType {
+  PERCENT
+  FIXED
+  FREE_DELIVERY
+}
+
+enum ReviewStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum StockAdjustmentType {
+  PURCHASE
+  SALE
+  RETURN
+  DAMAGE
+  CORRECTION
+}
+
+enum ReservationStatus {
+  PENDING
+  CONFIRMED
+  RELEASED
+  EXPIRED
+}
+
+enum ChangedByType {
+  CUSTOMER
+  STAFF
+  SYSTEM
+}
+
+enum AsyncJobStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
 // ===========================================
-// Additional models will be added as domains
-// are implemented in later phases:
-// - Product, Category, Brand
-// - Inventory, Reservation
-// - Cart, CartItem
-// - Order, OrderItem, OrderStatusHistory
-// - PaymentTransaction, MpesaTransaction
-// - Delivery, DeliveryEvent
-// - PromoCode, PromoUsage
-// - Review
+// USER DOMAIN
 // ===========================================
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  passwordHash  String    @map("password_hash")
+  firstName     String    @map("first_name")
+  lastName      String    @map("last_name")
+  phone         String?
+  role          UserRole  @default(CUSTOMER)
+  isActive      Boolean   @default(true) @map("is_active")
+  emailVerified Boolean   @default(false) @map("email_verified")
+  lastLoginAt   DateTime? @map("last_login_at")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+
+  // Relations
+  addresses          Address[]
+  carts              Cart[]
+  orders             Order[]
+  reviews            Review[]
+  stockAdjustments   StockAdjustment[]   @relation("AdjustedBy")
+  refundsApproved    Refund[]            @relation("ApprovedBy")
+  refundsProcessed   Refund[]            @relation("ProcessedBy")
+  statusChanges      OrderStatusHistory[] @relation("ChangedBy")
+  reviewsModerations Review[]            @relation("ModeratedBy")
+
+  @@index([role])
+  @@index([isActive])
+  @@map("users")
+}
+
+model Address {
+  id            String   @id @default(cuid())
+  userId        String   @map("user_id")
+  label         String
+  recipientName String   @map("recipient_name")
+  phone         String
+  line1         String
+  line2         String?
+  city          String
+  county        String
+  isDefault     Boolean  @default(false) @map("is_default")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([isDefault])
+  @@map("addresses")
+}
+
+// ===========================================
+// PRODUCT DOMAIN
+// ===========================================
+
+model Category {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  description String?
+  parentId    String?  @map("parent_id")
+  imageUrl    String?  @map("image_url")
+  sortOrder   Int      @default(0) @map("sort_order")
+  isActive    Boolean  @default(true) @map("is_active")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  // Relations (self-referential)
+  parent   Category?  @relation("CategoryTree", fields: [parentId], references: [id])
+  children Category[] @relation("CategoryTree")
+  products Product[]
+
+  @@index([parentId])
+  @@index([isActive])
+  @@index([sortOrder])
+  @@map("categories")
+}
+
+model Brand {
+  id        String   @id @default(cuid())
+  name      String
+  slug      String   @unique
+  logoUrl   String?  @map("logo_url")
+  isActive  Boolean  @default(true) @map("is_active")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  // Relations
+  products Product[]
+
+  @@index([isActive])
+  @@map("brands")
+}
+
+model Product {
+  id               String           @id @default(cuid())
+  sku              String           @unique
+  name             String
+  slug             String           @unique
+  description      String
+  shortDescription String?          @map("short_description")
+  price            Int
+  compareAtPrice   Int?             @map("compare_at_price")
+  condition        ProductCondition
+  categoryId       String           @map("category_id")
+  brandId          String?          @map("brand_id")
+  warrantyMonths   Int              @default(0) @map("warranty_months")
+  isActive         Boolean          @default(true) @map("is_active")
+  isFeatured       Boolean          @default(false) @map("is_featured")
+  createdAt        DateTime         @default(now()) @map("created_at")
+  updatedAt        DateTime         @updatedAt @map("updated_at")
+
+  // Relations
+  category         Category          @relation(fields: [categoryId], references: [id])
+  brand            Brand?            @relation(fields: [brandId], references: [id])
+  images           ProductImage[]
+  attributes       ProductAttribute[]
+  inventoryRecord  InventoryRecord?
+  cartItems        CartItem[]
+  orderItems       OrderItem[]
+  reviews          Review[]
+  reservations     Reservation[]
+  stockAdjustments StockAdjustment[]
+
+  @@index([categoryId])
+  @@index([brandId])
+  @@index([price])
+  @@index([isActive])
+  @@index([condition])
+  @@index([isFeatured])
+  @@map("products")
+}
+
+model ProductImage {
+  id        String  @id @default(cuid())
+  productId String  @map("product_id")
+  url       String
+  altText   String? @map("alt_text")
+  sortOrder Int     @default(0) @map("sort_order")
+  isPrimary Boolean @default(false) @map("is_primary")
+
+  // Relations
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([productId])
+  @@index([sortOrder])
+  @@map("product_images")
+}
+
+model ProductAttribute {
+  id        String @id @default(cuid())
+  productId String @map("product_id")
+  name      String
+  value     String
+
+  // Relations
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([productId, name])
+  @@index([productId])
+  @@map("product_attributes")
+}
+
+// ===========================================
+// INVENTORY DOMAIN
+// ===========================================
+
+model InventoryRecord {
+  id               String   @id @default(cuid())
+  productId        String   @unique @map("product_id")
+  quantityOnHand   Int      @default(0) @map("quantity_on_hand")
+  quantityReserved Int      @default(0) @map("quantity_reserved")
+  reorderThreshold Int      @default(5) @map("reorder_threshold")
+  updatedAt        DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@map("inventory_records")
+}
+
+model StockAdjustment {
+  id          String              @id @default(cuid())
+  productId   String              @map("product_id")
+  type        StockAdjustmentType
+  quantity    Int
+  reason      String?
+  referenceId String?             @map("reference_id")
+  adminId     String?             @map("admin_id")
+  createdAt   DateTime            @default(now()) @map("created_at")
+
+  // Relations
+  product Product @relation(fields: [productId], references: [id])
+  admin   User?   @relation("AdjustedBy", fields: [adminId], references: [id])
+
+  @@index([productId])
+  @@index([type])
+  @@index([createdAt])
+  @@map("stock_adjustments")
+}
+
+model Reservation {
+  id        String            @id @default(cuid())
+  productId String            @map("product_id")
+  orderId   String?           @map("order_id")
+  cartId    String?           @map("cart_id")
+  quantity  Int
+  status    ReservationStatus
+  expiresAt DateTime          @map("expires_at")
+  createdAt DateTime          @default(now()) @map("created_at")
+
+  // Relations
+  product Product @relation(fields: [productId], references: [id])
+  order   Order?  @relation(fields: [orderId], references: [id])
+  cart    Cart?   @relation(fields: [cartId], references: [id])
+
+  @@index([productId])
+  @@index([status])
+  @@index([expiresAt])
+  @@map("reservations")
+}
+
+// ===========================================
+// CART DOMAIN
+// ===========================================
+
+model Cart {
+  id          String    @id @default(cuid())
+  userId      String?   @map("user_id")
+  sessionId   String?   @map("session_id")
+  promoCodeId String?   @map("promo_code_id")
+  expiresAt   DateTime? @map("expires_at")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  // Relations
+  user         User?         @relation(fields: [userId], references: [id])
+  promoCode    PromoCode?    @relation(fields: [promoCodeId], references: [id])
+  items        CartItem[]
+  reservations Reservation[]
+
+  @@index([userId])
+  @@index([sessionId])
+  @@index([expiresAt])
+  @@map("carts")
+}
+
+model CartItem {
+  id         String   @id @default(cuid())
+  cartId     String   @map("cart_id")
+  productId  String   @map("product_id")
+  quantity   Int
+  priceAtAdd Int      @map("price_at_add")
+  addedAt    DateTime @default(now()) @map("added_at")
+
+  // Relations
+  cart    Cart    @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id])
+
+  @@unique([cartId, productId])
+  @@index([cartId])
+  @@index([productId])
+  @@map("cart_items")
+}
+
+// ===========================================
+// ORDER DOMAIN
+// ===========================================
+
+model Order {
+  id            String        @id @default(cuid())
+  orderNumber   String        @unique @map("order_number")
+  userId        String        @map("user_id")
+  email         String
+  phone         String
+  status        OrderStatus
+  subtotal      Int
+  deliveryFee   Int           @default(0) @map("delivery_fee")
+  discount      Int           @default(0)
+  total         Int
+  paymentMethod PaymentMethod @map("payment_method")
+  promoCodeId   String?       @map("promo_code_id")
+  notes         String?
+  createdAt     DateTime      @default(now()) @map("created_at")
+  updatedAt     DateTime      @updatedAt @map("updated_at")
+
+  // Relations
+  user          User                 @relation(fields: [userId], references: [id])
+  promoCode     PromoCode?           @relation(fields: [promoCodeId], references: [id])
+  items         OrderItem[]
+  address       OrderAddress?
+  statusHistory OrderStatusHistory[]
+  transactions  PaymentTransaction[]
+  delivery      Delivery?
+  reservations  Reservation[]
+  promoUsage    PromoUsage?
+  refunds       Refund[]
+
+  @@index([orderNumber])
+  @@index([userId])
+  @@index([status])
+  @@index([createdAt])
+  @@map("orders")
+}
+
+model OrderItem {
+  id          String @id @default(cuid())
+  orderId     String @map("order_id")
+  productId   String @map("product_id")
+  productName String @map("product_name")
+  productSku  String @map("product_sku")
+  quantity    Int
+  unitPrice   Int    @map("unit_price")
+  lineTotal   Int    @map("line_total")
+
+  // Relations
+  order   Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id])
+
+  @@index([orderId])
+  @@index([productId])
+  @@map("order_items")
+}
+
+model OrderAddress {
+  id            String  @id @default(cuid())
+  orderId       String  @unique @map("order_id")
+  recipientName String  @map("recipient_name")
+  phone         String
+  line1         String
+  line2         String?
+  city          String
+  county        String
+
+  // Relations
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@map("order_addresses")
+}
+
+model OrderStatusHistory {
+  id            String        @id @default(cuid())
+  orderId       String        @map("order_id")
+  fromStatus    OrderStatus?  @map("from_status")
+  toStatus      OrderStatus   @map("to_status")
+  changedById   String?       @map("changed_by_id")
+  changedByType ChangedByType @default(SYSTEM) @map("changed_by_type")
+  reason        String?
+  createdAt     DateTime      @default(now()) @map("created_at")
+
+  // Relations
+  order     Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  changedBy User? @relation("ChangedBy", fields: [changedById], references: [id])
+
+  @@index([orderId])
+  @@index([createdAt])
+  @@map("order_status_history")
+}
+
+// ===========================================
+// PAYMENT DOMAIN
+// ===========================================
+
+model PaymentTransaction {
+  id             String        @id @default(cuid())
+  orderId        String        @map("order_id")
+  method         PaymentMethod
+  amount         Int
+  currency       String        @default("KES")
+  status         PaymentStatus
+  providerRef    String?       @map("provider_ref")
+  idempotencyKey String        @unique @map("idempotency_key")
+  initiatedAt    DateTime      @default(now()) @map("initiated_at")
+  confirmedAt    DateTime?     @map("confirmed_at")
+  failedAt       DateTime?     @map("failed_at")
+
+  // Relations
+  order            Order             @relation(fields: [orderId], references: [id])
+  mpesaTransaction MpesaTransaction?
+  refunds          Refund[]
+
+  @@index([orderId])
+  @@index([status])
+  @@index([providerRef])
+  @@map("payment_transactions")
+}
+
+model MpesaTransaction {
+  id                 String    @id @default(cuid())
+  transactionId      String    @unique @map("transaction_id")
+  phoneNumber        String    @map("phone_number")
+  checkoutRequestId  String    @map("checkout_request_id")
+  merchantRequestId  String?   @map("merchant_request_id")
+  mpesaReceipt       String?   @map("mpesa_receipt")
+  resultCode         Int?      @map("result_code")
+  resultDesc         String?   @map("result_desc")
+  callbackReceivedAt DateTime? @map("callback_received_at")
+
+  // Relations
+  transaction PaymentTransaction @relation(fields: [transactionId], references: [id], onDelete: Cascade)
+
+  @@index([checkoutRequestId])
+  @@index([mpesaReceipt])
+  @@map("mpesa_transactions")
+}
+
+model Refund {
+  id            String       @id @default(cuid())
+  orderId       String       @map("order_id")
+  transactionId String       @map("transaction_id")
+  amount        Int
+  reason        String
+  status        RefundStatus
+  approvedById  String?      @map("approved_by_id")
+  processedById String?      @map("processed_by_id")
+  approvedAt    DateTime?    @map("approved_at")
+  processedAt   DateTime?    @map("processed_at")
+  createdAt     DateTime     @default(now()) @map("created_at")
+
+  // Relations
+  order       Order              @relation(fields: [orderId], references: [id])
+  transaction PaymentTransaction @relation(fields: [transactionId], references: [id])
+  approvedBy  User?              @relation("ApprovedBy", fields: [approvedById], references: [id])
+  processedBy User?              @relation("ProcessedBy", fields: [processedById], references: [id])
+
+  @@index([orderId])
+  @@index([status])
+  @@index([createdAt])
+  @@map("refunds")
+}
+
+// ===========================================
+// DELIVERY DOMAIN
+// ===========================================
+
+model DeliveryProvider {
+  id           String   @id @default(cuid())
+  name         String
+  code         String   @unique
+  contactPhone String?  @map("contact_phone")
+  apiEndpoint  String?  @map("api_endpoint")
+  isActive     Boolean  @default(true) @map("is_active")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  // Relations
+  deliveries Delivery[]
+
+  @@map("delivery_providers")
+}
+
+model Delivery {
+  id             String         @id @default(cuid())
+  orderId        String         @unique @map("order_id")
+  providerId     String         @map("provider_id")
+  status         DeliveryStatus
+  zone           DeliveryZone
+  fee            Int
+  trackingNumber String?        @map("tracking_number")
+  scheduledDate  DateTime?      @map("scheduled_date")
+  deliveredAt    DateTime?      @map("delivered_at")
+  createdAt      DateTime       @default(now()) @map("created_at")
+  updatedAt      DateTime       @updatedAt @map("updated_at")
+
+  // Relations
+  order           Order            @relation(fields: [orderId], references: [id])
+  provider        DeliveryProvider @relation(fields: [providerId], references: [id])
+  events          DeliveryEvent[]
+  proofOfDelivery ProofOfDelivery?
+
+  @@index([providerId])
+  @@index([status])
+  @@index([trackingNumber])
+  @@map("deliveries")
+}
+
+model DeliveryEvent {
+  id          String   @id @default(cuid())
+  deliveryId  String   @map("delivery_id")
+  eventType   String   @map("event_type")
+  description String
+  location    String?
+  occurredAt  DateTime @map("occurred_at")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  // Relations
+  delivery Delivery @relation(fields: [deliveryId], references: [id], onDelete: Cascade)
+
+  @@index([deliveryId])
+  @@index([occurredAt])
+  @@map("delivery_events")
+}
+
+model ProofOfDelivery {
+  id            String   @id @default(cuid())
+  deliveryId    String   @unique @map("delivery_id")
+  recipientName String   @map("recipient_name")
+  signatureUrl  String?  @map("signature_url")
+  photoUrl      String?  @map("photo_url")
+  notes         String?
+  collectedAt   DateTime @map("collected_at")
+
+  // Relations
+  delivery Delivery @relation(fields: [deliveryId], references: [id], onDelete: Cascade)
+
+  @@map("proof_of_deliveries")
+}
+
+// ===========================================
+// PROMOTION DOMAIN
+// ===========================================
+
+model PromoCode {
+  id                  String       @id @default(cuid())
+  code                String       @unique
+  discountType        DiscountType @map("discount_type")
+  discountValue       Int          @map("discount_value")
+  minOrderValue       Int?         @map("min_order_value")
+  maxUsageTotal       Int?         @map("max_usage_total")
+  maxUsagePerCustomer Int          @default(1) @map("max_usage_per_customer")
+  startsAt            DateTime     @map("starts_at")
+  expiresAt           DateTime     @map("expires_at")
+  isActive            Boolean      @default(true) @map("is_active")
+  createdAt           DateTime     @default(now()) @map("created_at")
+
+  // Relations
+  carts  Cart[]
+  orders Order[]
+  usages PromoUsage[]
+
+  @@index([isActive])
+  @@index([startsAt])
+  @@index([expiresAt])
+  @@map("promo_codes")
+}
+
+model PromoUsage {
+  id              String   @id @default(cuid())
+  promoCodeId     String   @map("promo_code_id")
+  userId          String   @map("user_id")
+  orderId         String   @unique @map("order_id")
+  discountApplied Int      @map("discount_applied")
+  usedAt          DateTime @default(now()) @map("used_at")
+
+  // Relations
+  promoCode PromoCode @relation(fields: [promoCodeId], references: [id])
+  order     Order     @relation(fields: [orderId], references: [id])
+
+  @@index([promoCodeId])
+  @@index([userId])
+  @@map("promo_usages")
+}
+
+// ===========================================
+// REVIEW DOMAIN
+// ===========================================
+
+model Review {
+  id           String       @id @default(cuid())
+  productId    String       @map("product_id")
+  userId       String       @map("user_id")
+  orderId      String       @map("order_id")
+  rating       Int
+  title        String?
+  body         String?
+  status       ReviewStatus @default(PENDING)
+  moderatedById String?     @map("moderated_by_id")
+  moderatedAt  DateTime?    @map("moderated_at")
+  createdAt    DateTime     @default(now()) @map("created_at")
+
+  // Relations
+  product     Product @relation(fields: [productId], references: [id])
+  user        User    @relation(fields: [userId], references: [id])
+  moderatedBy User?   @relation("ModeratedBy", fields: [moderatedById], references: [id])
+
+  @@unique([productId, userId])
+  @@index([productId])
+  @@index([userId])
+  @@index([status])
+  @@index([rating])
+  @@map("reviews")
+}
+
+// ===========================================
+// SYSTEM / ASYNC JOBS
+// ===========================================
+
+model AsyncJobLog {
+  id          String         @id @default(cuid())
+  queue       String
+  jobName     String         @map("job_name")
+  jobId       String         @map("job_id")
+  payload     Json?
+  status      AsyncJobStatus
+  attempts    Int            @default(0)
+  error       String?
+  startedAt   DateTime?      @map("started_at")
+  completedAt DateTime?      @map("completed_at")
+  createdAt   DateTime       @default(now()) @map("created_at")
+
+  @@index([queue])
+  @@index([jobName])
+  @@index([status])
+  @@index([createdAt])
+  @@map("async_job_logs")
+}

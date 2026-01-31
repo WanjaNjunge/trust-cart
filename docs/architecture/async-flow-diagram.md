@@ -82,23 +82,23 @@ flowchart TB
 
 ### 2.1 Queue Inventory
 
-| Queue Name | Purpose | Priority | Concurrency |
-|------------|---------|----------|-------------|
-| `payment-queue` | Payment verification, refund processing | 🔴 Critical | 5 |
-| `order-queue` | Order state transitions, timeout handling | 🔴 Critical | 5 |
-| `notification-queue` | Emails, SMS notifications | 🟡 Medium | 10 |
-| `inventory-queue` | Reservation release, stock alerts | 🟠 High | 5 |
-| `scheduled-queue` | Scheduled jobs (cleanup, reports) | 🟢 Low | 2 |
+| Queue Name           | Purpose                                   | Priority    | Concurrency |
+| -------------------- | ----------------------------------------- | ----------- | ----------- |
+| `payment-queue`      | Payment verification, refund processing   | 🔴 Critical | 5           |
+| `order-queue`        | Order state transitions, timeout handling | 🔴 Critical | 5           |
+| `notification-queue` | Emails, SMS notifications                 | 🟡 Medium   | 10          |
+| `inventory-queue`    | Reservation release, stock alerts         | 🟠 High     | 5           |
+| `scheduled-queue`    | Scheduled jobs (cleanup, reports)         | 🟢 Low      | 2           |
 
 ### 2.2 Queue Configuration
 
-| Queue | Max Retries | Retry Delay | Backoff | TTL |
-|-------|-------------|-------------|---------|-----|
-| `payment-queue` | 5 | 30s, 60s, 120s, 300s, 600s | Exponential | 24h |
-| `order-queue` | 3 | 10s, 30s, 60s | Exponential | 24h |
-| `notification-queue` | 3 | 5s, 15s, 60s | Exponential | 4h |
-| `inventory-queue` | 3 | 5s, 15s, 60s | Exponential | 1h |
-| `scheduled-queue` | 1 | — | None | 1h |
+| Queue                | Max Retries | Retry Delay                | Backoff     | TTL |
+| -------------------- | ----------- | -------------------------- | ----------- | --- |
+| `payment-queue`      | 5           | 30s, 60s, 120s, 300s, 600s | Exponential | 24h |
+| `order-queue`        | 3           | 10s, 30s, 60s              | Exponential | 24h |
+| `notification-queue` | 3           | 5s, 15s, 60s               | Exponential | 4h  |
+| `inventory-queue`    | 3           | 5s, 15s, 60s               | Exponential | 1h  |
+| `scheduled-queue`    | 1           | —                          | None        | 1h  |
 
 ---
 
@@ -144,13 +144,13 @@ sequenceDiagram
 
 **Job Definition: `payment.verify`**
 
-| Attribute | Value |
-|-----------|-------|
-| **Trigger** | Payment initiated, MPesa callback received |
-| **Actor** | System (Payment Worker) |
-| **Input** | `{ orderId, paymentId, checkoutRequestId }` |
-| **Output** | Payment status updated in DB |
-| **Retry** | 5 times, exponential backoff |
+| Attribute   | Value                                                     |
+| ----------- | --------------------------------------------------------- |
+| **Trigger** | Payment initiated, MPesa callback received                |
+| **Actor**   | System (Payment Worker)                                   |
+| **Input**   | `{ orderId, paymentId, checkoutRequestId }`               |
+| **Output**  | Payment status updated in DB                              |
+| **Retry**   | 5 times, exponential backoff                              |
 | **Failure** | Mark payment FAILED, notify customer, release reservation |
 
 ---
@@ -174,7 +174,7 @@ sequenceDiagram
     Q->>W: Dequeue job
     W->>DB: Get original payment
     W->>MP: B2C Transfer (refund)
-    
+
     alt Success
         MP-->>W: TransactionID
         W->>DB: Update refund COMPLETED
@@ -187,15 +187,15 @@ sequenceDiagram
 
 **Job Definition: `refund.process`**
 
-| Attribute | Value |
-|-----------|-------|
-| **Trigger** | Manager approval of refund request |
-| **Actor** | System (Payment Worker) |
-| **Approval Required** | ⚠️ Manager must approve before job is enqueued |
-| **Input** | `{ refundId, orderId, amount, phone }` |
-| **Output** | Refund processed via MPesa B2C |
-| **Retry** | 5 times, exponential backoff |
-| **Failure** | Alert Finance team, manual intervention required |
+| Attribute             | Value                                            |
+| --------------------- | ------------------------------------------------ |
+| **Trigger**           | Manager approval of refund request               |
+| **Actor**             | System (Payment Worker)                          |
+| **Approval Required** | ⚠️ Manager must approve before job is enqueued   |
+| **Input**             | `{ refundId, orderId, amount, phone }`           |
+| **Output**            | Refund processed via MPesa B2C                   |
+| **Retry**             | 5 times, exponential backoff                     |
+| **Failure**           | Alert Finance team, manual intervention required |
 
 ---
 
@@ -221,12 +221,12 @@ sequenceDiagram
 
 **Job Definition: `order.confirm`**
 
-| Attribute | Value |
-|-----------|-------|
-| **Trigger** | Payment confirmed |
-| **Actor** | System (Order Worker) |
-| **Input** | `{ orderId }` |
-| **Output** | Order status → CONFIRMED |
+| Attribute        | Value                     |
+| ---------------- | ------------------------- |
+| **Trigger**      | Payment confirmed         |
+| **Actor**        | System (Order Worker)     |
+| **Input**        | `{ orderId }`             |
+| **Output**       | Order status → CONFIRMED  |
 | **Side Effects** | Email notification queued |
 
 ---
@@ -245,7 +245,7 @@ sequenceDiagram
     SCH->>Q: Enqueue order.check_timeout (every 5 min)
     Q->>OW: Dequeue job
     OW->>DB: Find PENDING_PAYMENT orders > 24h
-    
+
     loop For each expired order
         OW->>DB: Update order CANCELLED
         OW->>IQ: Enqueue inventory.release_reservation
@@ -255,12 +255,12 @@ sequenceDiagram
 
 **Job Definition: `order.check_timeout`**
 
-| Attribute | Value |
-|-----------|-------|
-| **Trigger** | Scheduler (every 5 minutes) |
-| **Actor** | System (Scheduled Worker) |
-| **Input** | None |
-| **Output** | Expired orders cancelled |
+| Attribute        | Value                                     |
+| ---------------- | ----------------------------------------- |
+| **Trigger**      | Scheduler (every 5 minutes)               |
+| **Actor**        | System (Scheduled Worker)                 |
+| **Input**        | None                                      |
+| **Output**       | Expired orders cancelled                  |
 | **Side Effects** | Reservations released, customers notified |
 
 ---
@@ -284,11 +284,11 @@ flowchart TD
 
 **Approval Required Transitions:**
 
-| From State | To State | Approver | Reason |
-|------------|----------|----------|--------|
-| PROCESSING | CANCELLED | Manager | Stock issue, operational |
-| RETURN_REQUESTED | RETURN_APPROVED | Manager | Return validation |
-| REFUND_PENDING | REFUNDED | Finance Admin | Money movement |
+| From State       | To State        | Approver      | Reason                   |
+| ---------------- | --------------- | ------------- | ------------------------ |
+| PROCESSING       | CANCELLED       | Manager       | Stock issue, operational |
+| RETURN_REQUESTED | RETURN_APPROVED | Manager       | Return validation        |
+| REFUND_PENDING   | REFUNDED        | Finance Admin | Money movement           |
 
 ---
 
@@ -318,13 +318,13 @@ sequenceDiagram
 
 **Job Definition: `order.delivery_update`**
 
-| Attribute | Value |
-|-----------|-------|
-| **Trigger** | Courier webhook event |
-| **Actor** | System (Order Worker) |
-| **Input** | `{ deliveryId, eventType, timestamp, location }` |
-| **Output** | Delivery and order status updated |
-| **Side Effects** | SMS/Email notification queued |
+| Attribute        | Value                                            |
+| ---------------- | ------------------------------------------------ |
+| **Trigger**      | Courier webhook event                            |
+| **Actor**        | System (Order Worker)                            |
+| **Input**        | `{ deliveryId, eventType, timestamp, location }` |
+| **Output**       | Delivery and order status updated                |
+| **Side Effects** | SMS/Email notification queued                    |
 
 ---
 
@@ -371,7 +371,7 @@ sequenceDiagram
     EW->>DB: Get template + data
     EW->>EW: Render email
     EW->>ES: Send email (SendGrid/Mailgun)
-    
+
     alt Success
         ES-->>EW: Success
         EW->>DB: Log email sent
@@ -383,14 +383,14 @@ sequenceDiagram
 
 **Job Definition: `notification.email`**
 
-| Attribute | Value |
-|-----------|-------|
+| Attribute   | Value                                     |
+| ----------- | ----------------------------------------- |
 | **Trigger** | Various events (order, payment, delivery) |
-| **Actor** | System (Email Worker) |
-| **Input** | `{ template, recipientEmail, data }` |
-| **Output** | Email sent |
-| **Retry** | 3 times |
-| **Failure** | Log error, alert ops (don't block flow) |
+| **Actor**   | System (Email Worker)                     |
+| **Input**   | `{ template, recipientEmail, data }`      |
+| **Output**  | Email sent                                |
+| **Retry**   | 3 times                                   |
+| **Failure** | Log error, alert ops (don't block flow)   |
 
 ---
 
@@ -408,7 +408,7 @@ sequenceDiagram
     Q->>SW: Dequeue job
     SW->>DB: Get message template + phone
     SW->>SMS: Send SMS (Africa's Talking)
-    
+
     alt Success
         SMS-->>SW: MessageID
         SW->>DB: Log SMS sent
@@ -420,14 +420,14 @@ sequenceDiagram
 
 **Notification Events:**
 
-| Event | Template | Channel |
-|-------|----------|---------|
-| `order.confirmed` | "Order #{{orderNumber}} confirmed" | Email + SMS |
+| Event              | Template                                | Channel     |
+| ------------------ | --------------------------------------- | ----------- |
+| `order.confirmed`  | "Order #{{orderNumber}} confirmed"      | Email + SMS |
 | `order.dispatched` | "Order shipped, tracking: {{tracking}}" | Email + SMS |
-| `order.delivered` | "Order delivered!" | Email + SMS |
-| `payment.failed` | "Payment failed, retry here" | Email |
-| `refund.processed` | "Refund of KES {{amount}} processed" | Email + SMS |
-| `delivery.failed` | "Delivery attempt failed" | SMS |
+| `order.delivered`  | "Order delivered!"                      | Email + SMS |
+| `payment.failed`   | "Payment failed, retry here"            | Email       |
+| `refund.processed` | "Refund of KES {{amount}} processed"    | Email + SMS |
+| `delivery.failed`  | "Delivery attempt failed"               | SMS         |
 
 ---
 
@@ -445,7 +445,7 @@ sequenceDiagram
     SCH->>Q: Enqueue inventory.release_expired (every 5 min)
     Q->>IW: Dequeue job
     IW->>DB: Find expired reservations (> 30 min, no payment)
-    
+
     loop For each expired reservation
         IW->>DB: Release reservation
         IW->>DB: Update quantityReserved
@@ -455,12 +455,12 @@ sequenceDiagram
 
 **Job Definition: `inventory.release_expired`**
 
-| Attribute | Value |
-|-----------|-------|
-| **Trigger** | Scheduler (every 5 minutes) |
-| **Actor** | System (Inventory Worker) |
-| **Input** | None |
-| **Output** | Expired reservations released |
+| Attribute   | Value                         |
+| ----------- | ----------------------------- |
+| **Trigger** | Scheduler (every 5 minutes)   |
+| **Actor**   | System (Inventory Worker)     |
+| **Input**   | None                          |
+| **Output**  | Expired reservations released |
 
 ---
 
@@ -477,7 +477,7 @@ sequenceDiagram
     OW->>Q: Enqueue inventory.check_stock (after dispatch)
     Q->>IW: Dequeue job
     IW->>DB: Check stock level
-    
+
     alt Stock < reorderThreshold
         IW->>NQ: Enqueue notification.low_stock_alert
     end
@@ -489,14 +489,14 @@ sequenceDiagram
 
 ### 8.1 Job Schedule
 
-| Job | Schedule | Queue | Description |
-|-----|----------|-------|-------------|
-| `order.check_timeout` | Every 5 min | scheduled-queue | Cancel expired pending orders |
-| `inventory.release_expired` | Every 5 min | inventory-queue | Release expired reservations |
-| `cart.cleanup` | Daily 3:00 AM | scheduled-queue | Delete carts inactive > 7 days |
-| `session.cleanup` | Every 1 hour | scheduled-queue | Expire old sessions |
-| `report.daily_sales` | Daily 6:00 AM | scheduled-queue | Generate daily sales report |
-| `report.weekly_inventory` | Sunday 7:00 AM | scheduled-queue | Generate inventory report |
+| Job                         | Schedule       | Queue           | Description                    |
+| --------------------------- | -------------- | --------------- | ------------------------------ |
+| `order.check_timeout`       | Every 5 min    | scheduled-queue | Cancel expired pending orders  |
+| `inventory.release_expired` | Every 5 min    | inventory-queue | Release expired reservations   |
+| `cart.cleanup`              | Daily 3:00 AM  | scheduled-queue | Delete carts inactive > 7 days |
+| `session.cleanup`           | Every 1 hour   | scheduled-queue | Expire old sessions            |
+| `report.daily_sales`        | Daily 6:00 AM  | scheduled-queue | Generate daily sales report    |
+| `report.weekly_inventory`   | Sunday 7:00 AM | scheduled-queue | Generate inventory report      |
 
 ### 8.2 Scheduler Flow
 
@@ -531,22 +531,22 @@ flowchart TD
 
 ### 9.2 Backoff Calculation
 
-| Attempt | Delay (Exponential) |
-|---------|---------------------|
-| 1 | 30 seconds |
-| 2 | 60 seconds |
-| 3 | 120 seconds (2 min) |
-| 4 | 300 seconds (5 min) |
-| 5 | 600 seconds (10 min) |
+| Attempt | Delay (Exponential)  |
+| ------- | -------------------- |
+| 1       | 30 seconds           |
+| 2       | 60 seconds           |
+| 3       | 120 seconds (2 min)  |
+| 4       | 300 seconds (5 min)  |
+| 5       | 600 seconds (10 min) |
 
 ### 9.3 Dead Letter Queue Handling
 
-| Queue | DLQ Action | Alert |
-|-------|------------|-------|
-| `payment-queue` | Immediate escalation to Finance | 🔴 PagerDuty |
-| `order-queue` | Escalation to Operations | 🟠 Slack + Email |
-| `notification-queue` | Log only, no block | 🟢 Log |
-| `inventory-queue` | Alert Warehouse | 🟡 Slack |
+| Queue                | DLQ Action                      | Alert            |
+| -------------------- | ------------------------------- | ---------------- |
+| `payment-queue`      | Immediate escalation to Finance | 🔴 PagerDuty     |
+| `order-queue`        | Escalation to Operations        | 🟠 Slack + Email |
+| `notification-queue` | Log only, no block              | 🟢 Log           |
+| `inventory-queue`    | Alert Warehouse                 | 🟡 Slack         |
 
 ---
 
@@ -561,7 +561,7 @@ flowchart TD
         B -->|No| C[Enqueue Job Directly]
         B -->|Yes| D[Create Approval Request]
     end
-    
+
     subgraph "Approval Phase"
         D --> E[Notify Approver]
         E --> F{Decision}
@@ -569,26 +569,26 @@ flowchart TD
         F -->|Reject| H[Notify Requester]
         F -->|Timeout 48h| I[Escalate]
     end
-    
+
     subgraph "Execution Phase"
         G --> J[Worker Validates approval_id]
         J -->|Valid| K[Execute Job]
         J -->|Invalid| L[Reject Job]
     end
-    
+
     style D fill:#ffcc00
     style F fill:#ffcc00
 ```
 
 ### 10.2 Approval Matrix
 
-| Job | Requires Approval | Approver | Timeout |
-|-----|-------------------|----------|---------|
-| `refund.process` | ⚠️ Yes | Manager + Finance | 48h |
-| `order.cancel_after_processing` | ⚠️ Yes | Manager | 24h |
-| `order.force_transition` | ⚠️ Yes | Super Admin | 4h |
-| `inventory.large_adjustment` | ⚠️ Yes (>100 units) | Manager | 24h |
-| `promotion.high_discount` | ⚠️ Yes (>50%) | CEO | 48h |
+| Job                             | Requires Approval   | Approver          | Timeout |
+| ------------------------------- | ------------------- | ----------------- | ------- |
+| `refund.process`                | ⚠️ Yes              | Manager + Finance | 48h     |
+| `order.cancel_after_processing` | ⚠️ Yes              | Manager           | 24h     |
+| `order.force_transition`        | ⚠️ Yes              | Super Admin       | 4h      |
+| `inventory.large_adjustment`    | ⚠️ Yes (>100 units) | Manager           | 24h     |
+| `promotion.high_discount`       | ⚠️ Yes (>50%)       | CEO               | 48h     |
 
 ---
 
@@ -596,20 +596,20 @@ flowchart TD
 
 ### 11.1 Event Definitions
 
-| Event Name | Producer | Consumers | Payload |
-|------------|----------|-----------|---------|
-| `payment.initiated` | Payment Service | — (logged) | `{ orderId, amount, method }` |
-| `payment.confirmed` | Payment Worker | Order, Notification | `{ orderId, paymentId, receipt }` |
-| `payment.failed` | Payment Worker | Order, Notification | `{ orderId, reason }` |
-| `order.created` | Order Service | — (logged) | `{ orderId, customerId }` |
-| `order.confirmed` | Order Worker | Notification, Inventory | `{ orderId }` |
-| `order.dispatched` | Order Service | Notification, Inventory | `{ orderId, trackingNumber }` |
-| `order.delivered` | Order Worker | Notification | `{ orderId }` |
-| `order.cancelled` | Order Worker | Inventory, Notification | `{ orderId, reason }` |
-| `refund.requested` | Order Service | — (approval workflow) | `{ refundId, orderId, amount }` |
-| `refund.processed` | Payment Worker | Order, Notification | `{ refundId, transactionId }` |
-| `delivery.updated` | Webhook Handler | Order, Notification | `{ deliveryId, status }` |
-| `inventory.low_stock` | Inventory Worker | Notification | `{ productId, quantity }` |
+| Event Name            | Producer         | Consumers               | Payload                           |
+| --------------------- | ---------------- | ----------------------- | --------------------------------- |
+| `payment.initiated`   | Payment Service  | — (logged)              | `{ orderId, amount, method }`     |
+| `payment.confirmed`   | Payment Worker   | Order, Notification     | `{ orderId, paymentId, receipt }` |
+| `payment.failed`      | Payment Worker   | Order, Notification     | `{ orderId, reason }`             |
+| `order.created`       | Order Service    | — (logged)              | `{ orderId, customerId }`         |
+| `order.confirmed`     | Order Worker     | Notification, Inventory | `{ orderId }`                     |
+| `order.dispatched`    | Order Service    | Notification, Inventory | `{ orderId, trackingNumber }`     |
+| `order.delivered`     | Order Worker     | Notification            | `{ orderId }`                     |
+| `order.cancelled`     | Order Worker     | Inventory, Notification | `{ orderId, reason }`             |
+| `refund.requested`    | Order Service    | — (approval workflow)   | `{ refundId, orderId, amount }`   |
+| `refund.processed`    | Payment Worker   | Order, Notification     | `{ refundId, transactionId }`     |
+| `delivery.updated`    | Webhook Handler  | Order, Notification     | `{ deliveryId, status }`          |
+| `inventory.low_stock` | Inventory Worker | Notification            | `{ productId, quantity }`         |
 
 ---
 
@@ -617,45 +617,45 @@ flowchart TD
 
 ### 12.1 Queue Metrics
 
-| Metric | Alert Threshold | Action |
-|--------|-----------------|--------|
-| Queue depth | > 1000 jobs | Scale workers |
-| Job age (oldest) | > 5 minutes | Investigate |
-| Failed jobs (hourly) | > 10 | Alert ops |
-| DLQ depth | > 0 | Immediate review |
-| Processing time (p95) | > 30s | Optimize |
+| Metric                | Alert Threshold | Action           |
+| --------------------- | --------------- | ---------------- |
+| Queue depth           | > 1000 jobs     | Scale workers    |
+| Job age (oldest)      | > 5 minutes     | Investigate      |
+| Failed jobs (hourly)  | > 10            | Alert ops        |
+| DLQ depth             | > 0             | Immediate review |
+| Processing time (p95) | > 30s           | Optimize         |
 
 ### 12.2 Async Dashboards
 
-| Dashboard | Metrics Shown |
-|-----------|---------------|
-| Queue Health | Depth, throughput, latency per queue |
-| Worker Status | Active workers, processing rate |
-| Failed Jobs | Failure rate, failure reasons |
-| DLQ Monitor | Jobs awaiting manual intervention |
+| Dashboard     | Metrics Shown                        |
+| ------------- | ------------------------------------ |
+| Queue Health  | Depth, throughput, latency per queue |
+| Worker Status | Active workers, processing rate      |
+| Failed Jobs   | Failure rate, failure reasons        |
+| DLQ Monitor   | Jobs awaiting manual intervention    |
 
 ---
 
 ## Artefact Cross-References
 
-| Async Flow Aspect | Source Artefact |
-|-------------------|-----------------|
-| Order States | [order-lifecycle-state-machine.md](file:///c:/Users/STEPH/Documents/Portfolio/Projects/modern-ecom/docs/planning/order-lifecycle-state-machine.md) |
-| Payment Rules | [business-model-revenue-flows.md](file:///c:/Users/STEPH/Documents/Portfolio/Projects/modern-ecom/docs/planning/business-model-revenue-flows.md) |
-| Approval Gates | [agent-scope-authority.md](file:///c:/Users/STEPH/Documents/Portfolio/Projects/modern-ecom/docs/planning/agent-scope-authority.md) |
-| Risk Points | [risk-register-compliance.md](file:///c:/Users/STEPH/Documents/Portfolio/Projects/modern-ecom/docs/planning/risk-register-compliance.md) |
-| System Architecture | [system-architecture.md](file:///c:/Users/STEPH/Documents/Portfolio/Projects/modern-ecom/docs/architecture/system-architecture.md) |
+| Async Flow Aspect   | Source Artefact                                                                                                                                    |
+| ------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Order States        | [order-lifecycle-state-machine.md](file:///c:/Users/STEPH/Documents/Portfolio/Projects/modern-ecom/docs/planning/order-lifecycle-state-machine.md) |
+| Payment Rules       | [business-model-revenue-flows.md](file:///c:/Users/STEPH/Documents/Portfolio/Projects/modern-ecom/docs/planning/business-model-revenue-flows.md)   |
+| Approval Gates      | [agent-scope-authority.md](file:///c:/Users/STEPH/Documents/Portfolio/Projects/modern-ecom/docs/planning/agent-scope-authority.md)                 |
+| Risk Points         | [risk-register-compliance.md](file:///c:/Users/STEPH/Documents/Portfolio/Projects/modern-ecom/docs/planning/risk-register-compliance.md)           |
+| System Architecture | [system-architecture.md](file:///c:/Users/STEPH/Documents/Portfolio/Projects/modern-ecom/docs/architecture/system-architecture.md)                 |
 
 ---
 
 ## Document Approval
 
-| Role | Name | Status | Date |
-|------|------|--------|------|
-| Technical Architect | — | Pending | — |
-| Tech Lead | — | Pending | — |
-| Operations Lead | — | Pending | — |
+| Role                | Name | Status  | Date |
+| ------------------- | ---- | ------- | ---- |
+| Technical Architect | —    | Pending | —    |
+| Tech Lead           | —    | Pending | —    |
+| Operations Lead     | —    | Pending | —    |
 
 ---
 
-*This document defines all asynchronous flows. All workers must implement proper retry, failure handling, and observability. Approval-gated jobs must validate approval before execution.*
+_This document defines all asynchronous flows. All workers must implement proper retry, failure handling, and observability. Approval-gated jobs must validate approval before execution._

@@ -13,6 +13,7 @@ This document provides a step-by-step plan for initializing the TrustCart Kenya 
 
 > [!IMPORTANT]
 > **Scope Boundaries:**
+>
 > - ✅ Project scaffolding, folder structure, configs
 > - ✅ Local and Dev environment setup
 > - ✅ CI/CD skeleton for Local and Dev
@@ -44,14 +45,14 @@ modern-ecom/
 
 ### 1.2 Branch Structure
 
-| Branch | Purpose | Protection |
-|--------|---------|------------|
-| `main` | Production-ready code | Protected, requires approval |
-| `develop` | Integration branch | Protected, requires 1 review |
-| `feature/*` | Feature development | No protection |
-| `bugfix/*` | Bug fixes | No protection |
-| `release/*` | Release preparation | Protected |
-| `hotfix/*` | Production hotfixes | Protected |
+| Branch      | Purpose               | Protection                   |
+| ----------- | --------------------- | ---------------------------- |
+| `main`      | Production-ready code | Protected, requires approval |
+| `develop`   | Integration branch    | Protected, requires 1 review |
+| `feature/*` | Feature development   | No protection                |
+| `bugfix/*`  | Bug fixes             | No protection                |
+| `release/*` | Release preparation   | Protected                    |
+| `hotfix/*`  | Production hotfixes   | Protected                    |
 
 ### 1.3 Branch Naming Convention
 
@@ -230,12 +231,12 @@ packages/shared/
 
 ### 3.1 Environment Files
 
-| File | Purpose | Git Status |
-|------|---------|------------|
-| `.env.example` | Template with placeholders | ✅ Committed |
-| `.env.local` | Local development | ❌ Git-ignored |
-| `.env.development` | Dev environment | ❌ Git-ignored |
-| `.env.test` | Test environment | ❌ Git-ignored |
+| File               | Purpose                    | Git Status     |
+| ------------------ | -------------------------- | -------------- |
+| `.env.example`     | Template with placeholders | ✅ Committed   |
+| `.env.local`       | Local development          | ❌ Git-ignored |
+| `.env.development` | Dev environment            | ❌ Git-ignored |
+| `.env.test`        | Test environment           | ❌ Git-ignored |
 
 ### 3.2 Backend Environment Variables (.env.example)
 
@@ -328,11 +329,11 @@ services:
       POSTGRES_PASSWORD: trustcart_local
       POSTGRES_DB: trustcart_dev
     ports:
-      - "5432:5432"
+      - '5432:5432'
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U trustcart"]
+      test: ['CMD-SHELL', 'pg_isready -U trustcart']
       interval: 10s
       timeout: 5s
       retries: 5
@@ -341,11 +342,11 @@ services:
     image: redis:7-alpine
     container_name: trustcart-redis
     ports:
-      - "6379:6379"
+      - '6379:6379'
     volumes:
       - redis_data:/data
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test: ['CMD', 'redis-cli', 'ping']
       interval: 10s
       timeout: 5s
       retries: 5
@@ -354,8 +355,8 @@ services:
     image: mailhog/mailhog
     container_name: trustcart-mailhog
     ports:
-      - "1025:1025"  # SMTP
-      - "8025:8025"  # Web UI
+      - '1025:1025' # SMTP
+      - '8025:8025' # Web UI
     profiles:
       - email
 
@@ -366,12 +367,13 @@ volumes:
 
 ### 3.5 Secrets Management Guide
 
-| Environment | Storage | Access |
-|-------------|---------|--------|
-| Local | `.env.local` file | Developer only |
-| Dev | Cloud Secrets Manager | Dev team (read) |
+| Environment | Storage               | Access          |
+| ----------- | --------------------- | --------------- |
+| Local       | `.env.local` file     | Developer only  |
+| Dev         | Cloud Secrets Manager | Dev team (read) |
 
 **Local Development Rules:**
+
 - Never commit `.env.local` or any file with real secrets
 - Use placeholder values in `.env.example`
 - Rotate local secrets periodically
@@ -384,6 +386,7 @@ volumes:
 ### 4.1 Root Configuration Files
 
 **ESLint (`.eslintrc.js`):**
+
 ```javascript
 module.exports = {
   root: true,
@@ -404,6 +407,7 @@ module.exports = {
 ```
 
 **Prettier (`.prettierrc`):**
+
 ```json
 {
   "semi": true,
@@ -415,6 +419,7 @@ module.exports = {
 ```
 
 **TypeScript (`tsconfig.base.json`):**
+
 ```json
 {
   "compilerOptions": {
@@ -451,18 +456,14 @@ module.exports = {
     "type-check": "tsc --noEmit"
   },
   "lint-staged": {
-    "*.{ts,tsx}": [
-      "eslint --fix",
-      "prettier --write"
-    ],
-    "*.{json,md}": [
-      "prettier --write"
-    ]
+    "*.{ts,tsx}": ["eslint --fix", "prettier --write"],
+    "*.{json,md}": ["prettier --write"]
   }
 }
 ```
 
 **.husky/pre-commit:**
+
 ```bash
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
@@ -474,6 +475,7 @@ pnpm type-check
 ### 4.3 Testing Structure
 
 **Backend Test Directories:**
+
 ```
 apps/api/
 ├── src/modules/{module}/__tests__/     # Unit tests (co-located)
@@ -484,6 +486,7 @@ apps/api/
 ```
 
 **Frontend Test Directories:**
+
 ```
 apps/web/
 ├── __tests__/
@@ -496,6 +499,7 @@ apps/web/
 ```
 
 **Test Configuration:**
+
 ```json
 // apps/api/jest.config.js
 module.exports = {
@@ -526,6 +530,7 @@ module.exports = {
 ### 5.1 GitHub Actions Workflow (Local/Dev Only)
 
 **.github/workflows/ci.yml:**
+
 ```yaml
 name: CI Pipeline
 
@@ -545,22 +550,22 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      
+
       - uses: pnpm/action-setup@v2
         with:
           version: ${{ env.PNPM_VERSION }}
-      
+
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'pnpm'
-      
+
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-      
+
       - name: Lint
         run: pnpm lint
-      
+
       - name: Type Check
         run: pnpm type-check
 
@@ -568,7 +573,7 @@ jobs:
     name: Test Backend
     runs-on: ubuntu-latest
     needs: lint
-    
+
     services:
       postgres:
         image: postgres:15-alpine
@@ -583,42 +588,42 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
-      
+
       redis:
         image: redis:7-alpine
         ports:
           - 6379:6379
-    
+
     steps:
       - uses: actions/checkout@v4
-      
+
       - uses: pnpm/action-setup@v2
         with:
           version: ${{ env.PNPM_VERSION }}
-      
+
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'pnpm'
-      
+
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-      
+
       - name: Generate Prisma Client
         run: pnpm --filter api prisma generate
-      
+
       - name: Run Migrations
         run: pnpm --filter api prisma migrate deploy
         env:
           DATABASE_URL: postgresql://test:test@localhost:5432/trustcart_test
-      
+
       - name: Run Tests
         run: pnpm --filter api test:cov
         env:
           DATABASE_URL: postgresql://test:test@localhost:5432/trustcart_test
           REDIS_HOST: localhost
           REDIS_PORT: 6379
-      
+
       - name: Upload Coverage
         uses: codecov/codecov-action@v3
         with:
@@ -629,25 +634,25 @@ jobs:
     name: Test Frontend
     runs-on: ubuntu-latest
     needs: lint
-    
+
     steps:
       - uses: actions/checkout@v4
-      
+
       - uses: pnpm/action-setup@v2
         with:
           version: ${{ env.PNPM_VERSION }}
-      
+
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'pnpm'
-      
+
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-      
+
       - name: Run Tests
         run: pnpm --filter web test:cov
-      
+
       - name: Upload Coverage
         uses: codecov/codecov-action@v3
         with:
@@ -658,28 +663,28 @@ jobs:
     name: Build
     runs-on: ubuntu-latest
     needs: [test-api, test-web]
-    
+
     steps:
       - uses: actions/checkout@v4
-      
+
       - uses: pnpm/action-setup@v2
         with:
           version: ${{ env.PNPM_VERSION }}
-      
+
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'pnpm'
-      
+
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-      
+
       - name: Build API
         run: pnpm --filter api build
-      
+
       - name: Build Web
         run: pnpm --filter web build
-      
+
       # Placeholder for artifact upload (future)
       # - name: Upload Artifacts
       #   uses: actions/upload-artifact@v4
@@ -699,6 +704,7 @@ jobs:
 ### 5.2 Package Scripts
 
 **Root package.json:**
+
 ```json
 {
   "name": "trustcart-kenya",
@@ -776,30 +782,31 @@ Production-grade electronics e-commerce platform for Kenya.
 
 ### Available Scripts
 
-| Command | Description |
-|---------|-------------|
-| `pnpm dev` | Start all apps in development mode |
-| `pnpm dev:api` | Start backend only |
-| `pnpm dev:web` | Start frontend only |
-| `pnpm build` | Build all apps |
-| `pnpm test` | Run all tests |
-| `pnpm lint` | Lint all code |
-| `pnpm docker:up` | Start local Docker services |
-| `pnpm db:migrate` | Run database migrations |
-| `pnpm db:studio` | Open Prisma Studio |
+| Command           | Description                        |
+| ----------------- | ---------------------------------- |
+| `pnpm dev`        | Start all apps in development mode |
+| `pnpm dev:api`    | Start backend only                 |
+| `pnpm dev:web`    | Start frontend only                |
+| `pnpm build`      | Build all apps                     |
+| `pnpm test`       | Run all tests                      |
+| `pnpm lint`       | Lint all code                      |
+| `pnpm docker:up`  | Start local Docker services        |
+| `pnpm db:migrate` | Run database migrations            |
+| `pnpm db:studio`  | Open Prisma Studio                 |
 
 ## Project Structure
-
 ```
+
 trustcart-kenya/
 ├── apps/
-│   ├── web/          # Next.js frontend
-│   └── api/          # NestJS backend
+│ ├── web/ # Next.js frontend
+│ └── api/ # NestJS backend
 ├── packages/
-│   └── shared/       # Shared types and utilities
-├── docs/             # Documentation
-├── docker/           # Docker configurations
-└── .github/          # CI/CD workflows
+│ └── shared/ # Shared types and utilities
+├── docs/ # Documentation
+├── docker/ # Docker configurations
+└── .github/ # CI/CD workflows
+
 ```
 
 ## Documentation
@@ -818,57 +825,57 @@ Proprietary - All rights reserved
 
 ### Phase 1: Repository Setup
 
-| Step | Command/Action | Verification |
-|------|----------------|--------------|
-| 1.1 | Create pnpm workspace config | `pnpm-workspace.yaml` exists |
-| 1.2 | Create root `package.json` | Dependencies installable |
-| 1.3 | Create `.gitignore` | Sensitive files excluded |
-| 1.4 | Create root configs (ESLint, Prettier, TSConfig) | `pnpm lint` runs |
-| 1.5 | Setup Husky pre-commit hooks | Hooks trigger on commit |
+| Step | Command/Action                                   | Verification                 |
+| ---- | ------------------------------------------------ | ---------------------------- |
+| 1.1  | Create pnpm workspace config                     | `pnpm-workspace.yaml` exists |
+| 1.2  | Create root `package.json`                       | Dependencies installable     |
+| 1.3  | Create `.gitignore`                              | Sensitive files excluded     |
+| 1.4  | Create root configs (ESLint, Prettier, TSConfig) | `pnpm lint` runs             |
+| 1.5  | Setup Husky pre-commit hooks                     | Hooks trigger on commit      |
 
 ### Phase 2: Backend Scaffolding
 
-| Step | Command/Action | Verification |
-|------|----------------|--------------|
-| 2.1 | Initialize NestJS project in `apps/api` | `pnpm --filter api dev` starts |
-| 2.2 | Add Prisma and configure schema | `pnpm --filter api prisma generate` succeeds |
-| 2.3 | Create module folder structure | Folders match spec |
-| 2.4 | Add `.env.example` | Template complete |
-| 2.5 | Configure Jest | `pnpm --filter api test` runs |
+| Step | Command/Action                          | Verification                                 |
+| ---- | --------------------------------------- | -------------------------------------------- |
+| 2.1  | Initialize NestJS project in `apps/api` | `pnpm --filter api dev` starts               |
+| 2.2  | Add Prisma and configure schema         | `pnpm --filter api prisma generate` succeeds |
+| 2.3  | Create module folder structure          | Folders match spec                           |
+| 2.4  | Add `.env.example`                      | Template complete                            |
+| 2.5  | Configure Jest                          | `pnpm --filter api test` runs                |
 
 ### Phase 3: Frontend Scaffolding
 
-| Step | Command/Action | Verification |
-|------|----------------|--------------|
-| 3.1 | Initialize Next.js project in `apps/web` | `pnpm --filter web dev` starts |
-| 3.2 | Configure Tailwind CSS | Styles apply correctly |
-| 3.3 | Create folder structure | Folders match spec |
-| 3.4 | Add `.env.example` | Template complete |
-| 3.5 | Configure Jest/Vitest | `pnpm --filter web test` runs |
+| Step | Command/Action                           | Verification                   |
+| ---- | ---------------------------------------- | ------------------------------ |
+| 3.1  | Initialize Next.js project in `apps/web` | `pnpm --filter web dev` starts |
+| 3.2  | Configure Tailwind CSS                   | Styles apply correctly         |
+| 3.3  | Create folder structure                  | Folders match spec             |
+| 3.4  | Add `.env.example`                       | Template complete              |
+| 3.5  | Configure Jest/Vitest                    | `pnpm --filter web test` runs  |
 
 ### Phase 4: Shared Package
 
-| Step | Command/Action | Verification |
-|------|----------------|--------------|
-| 4.1 | Create `packages/shared` structure | Package builds |
-| 4.2 | Add shared types | Types importable in apps |
-| 4.3 | Add shared constants | Constants importable |
+| Step | Command/Action                     | Verification             |
+| ---- | ---------------------------------- | ------------------------ |
+| 4.1  | Create `packages/shared` structure | Package builds           |
+| 4.2  | Add shared types                   | Types importable in apps |
+| 4.3  | Add shared constants               | Constants importable     |
 
 ### Phase 5: Docker & Local Services
 
-| Step | Command/Action | Verification |
-|------|----------------|--------------|
-| 5.1 | Create `docker-compose.local.yml` | `pnpm docker:up` starts services |
-| 5.2 | Verify PostgreSQL connection | Prisma connects |
-| 5.3 | Verify Redis connection | BullMQ connects |
+| Step | Command/Action                    | Verification                     |
+| ---- | --------------------------------- | -------------------------------- |
+| 5.1  | Create `docker-compose.local.yml` | `pnpm docker:up` starts services |
+| 5.2  | Verify PostgreSQL connection      | Prisma connects                  |
+| 5.3  | Verify Redis connection           | BullMQ connects                  |
 
 ### Phase 6: CI/CD Setup
 
-| Step | Command/Action | Verification |
-|------|----------------|--------------|
-| 6.1 | Create `.github/workflows/ci.yml` | Workflow visible in GitHub |
-| 6.2 | Test workflow locally (act) | All jobs pass |
-| 6.3 | Push and verify CI runs | Green pipeline |
+| Step | Command/Action                    | Verification               |
+| ---- | --------------------------------- | -------------------------- |
+| 6.1  | Create `.github/workflows/ci.yml` | Workflow visible in GitHub |
+| 6.2  | Test workflow locally (act)       | All jobs pass              |
+| 6.3  | Push and verify CI runs           | Green pipeline             |
 
 ---
 
@@ -876,17 +883,17 @@ Proprietary - All rights reserved
 
 ### 8.1 Automated Verification
 
-| Check | Command | Expected Result |
-|-------|---------|-----------------|
-| Dependencies install | `pnpm install` | No errors |
-| Lint passes | `pnpm lint` | No errors |
-| Type check passes | `pnpm type-check` | No errors |
-| API builds | `pnpm --filter api build` | Builds successfully |
-| Web builds | `pnpm --filter web build` | Builds successfully |
-| API tests run | `pnpm --filter api test` | Tests pass |
-| Web tests run | `pnpm --filter web test` | Tests pass |
-| Docker starts | `pnpm docker:up` | Services healthy |
-| DB connects | `pnpm --filter api prisma db push` | Schema applied |
+| Check                | Command                            | Expected Result     |
+| -------------------- | ---------------------------------- | ------------------- |
+| Dependencies install | `pnpm install`                     | No errors           |
+| Lint passes          | `pnpm lint`                        | No errors           |
+| Type check passes    | `pnpm type-check`                  | No errors           |
+| API builds           | `pnpm --filter api build`          | Builds successfully |
+| Web builds           | `pnpm --filter web build`          | Builds successfully |
+| API tests run        | `pnpm --filter api test`           | Tests pass          |
+| Web tests run        | `pnpm --filter web test`           | Tests pass          |
+| Docker starts        | `pnpm docker:up`                   | Services healthy    |
+| DB connects          | `pnpm --filter api prisma db push` | Schema applied      |
 
 ### 8.2 Manual Verification
 
@@ -917,31 +924,31 @@ Proprietary - All rights reserved
 
 ### Assumptions
 
-| Assumption | Impact if False |
-|------------|-----------------|
-| Developer has Node.js 20+ installed | Setup will fail |
-| Developer has Docker installed | Local services unavailable |
-| Developer has pnpm installed | Alternative package manager needed |
-| GitHub is the repository host | CI/CD adjustments needed |
+| Assumption                          | Impact if False                    |
+| ----------------------------------- | ---------------------------------- |
+| Developer has Node.js 20+ installed | Setup will fail                    |
+| Developer has Docker installed      | Local services unavailable         |
+| Developer has pnpm installed        | Alternative package manager needed |
+| GitHub is the repository host       | CI/CD adjustments needed           |
 
 ### Constraints
 
-| Constraint | Reason |
-|------------|--------|
-| No business logic | Scaffolding phase only |
-| Local/Dev only | SIT/UAT/Prod require additional approvals |
-| No real secrets | Security requirement |
-| No high-risk domains | Payment, PII deferred |
+| Constraint           | Reason                                    |
+| -------------------- | ----------------------------------------- |
+| No business logic    | Scaffolding phase only                    |
+| Local/Dev only       | SIT/UAT/Prod require additional approvals |
+| No real secrets      | Security requirement                      |
+| No high-risk domains | Payment, PII deferred                     |
 
 ---
 
 ## Document Approval
 
-| Role | Name | Status | Date |
-|------|------|--------|------|
-| Tech Lead | — | Pending | — |
-| DevOps Lead | — | Pending | — |
+| Role        | Name | Status  | Date |
+| ----------- | ---- | ------- | ---- |
+| Tech Lead   | —    | Pending | —    |
+| DevOps Lead | —    | Pending | —    |
 
 ---
 
-*Upon approval, this plan will be executed to establish the project foundation. No business logic will be implemented during this phase.*
+_Upon approval, this plan will be executed to establish the project foundation. No business logic will be implemented during this phase._

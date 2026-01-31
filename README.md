@@ -4,13 +4,13 @@ Production-grade electronics e-commerce platform for Kenya.
 
 ## Tech Stack
 
-| Layer | Technology |
-| -------- | -------------------------------------- |
+| Layer    | Technology                           |
+| -------- | ------------------------------------ |
 | Frontend | Next.js 14, TypeScript, Tailwind CSS |
-| Backend | NestJS 10, TypeScript |
-| Database | PostgreSQL 15, Prisma ORM |
-| Queue | BullMQ, Redis 7 |
-| Runtime | Node.js 20 LTS |
+| Backend  | NestJS 10, TypeScript                |
+| Database | PostgreSQL 15, Prisma ORM            |
+| Queue    | BullMQ, Redis 7                      |
+| Runtime  | Node.js 20 LTS                       |
 
 ## Prerequisites
 
@@ -43,19 +43,19 @@ pnpm dev
 
 ## Available Scripts
 
-| Command           | Description                        |
-| ----------------- | ---------------------------------- |
-| `pnpm dev`        | Start all apps in development mode |
-| `pnpm dev:api`    | Start backend only                 |
-| `pnpm dev:web`    | Start frontend only                |
-| `pnpm build`      | Build all apps                     |
-| `pnpm test`       | Run all tests                      |
-| `pnpm lint`       | Lint all code                      |
-| `pnpm type-check` | Type check all code                |
-| `pnpm docker:up`  | Start local Docker services        |
-| `pnpm docker:down`| Stop local Docker services         |
-| `pnpm db:migrate` | Run database migrations            |
-| `pnpm db:studio`  | Open Prisma Studio                 |
+| Command            | Description                        |
+| ------------------ | ---------------------------------- |
+| `pnpm dev`         | Start all apps in development mode |
+| `pnpm dev:api`     | Start backend only                 |
+| `pnpm dev:web`     | Start frontend only                |
+| `pnpm build`       | Build all apps                     |
+| `pnpm test`        | Run all tests                      |
+| `pnpm lint`        | Lint all code                      |
+| `pnpm type-check`  | Type check all code                |
+| `pnpm docker:up`   | Start local Docker services        |
+| `pnpm docker:down` | Stop local Docker services         |
+| `pnpm db:migrate`  | Run database migrations            |
+| `pnpm db:studio`   | Open Prisma Studio                 |
 
 ## Project Structure
 
@@ -75,12 +75,12 @@ trustcart-kenya/
 
 ## Development URLs
 
-| Service     | URL                   |
-| ----------- | --------------------- |
-| Frontend    | http://localhost:3000 |
-| Backend API | http://localhost:3001 |
+| Service       | URL                   |
+| ------------- | --------------------- |
+| Frontend      | http://localhost:3000 |
+| Backend API   | http://localhost:3001 |
 | Prisma Studio | http://localhost:5555 |
-| Mailhog UI  | http://localhost:8025 |
+| Mailhog UI    | http://localhost:8025 |
 
 ## Documentation
 
