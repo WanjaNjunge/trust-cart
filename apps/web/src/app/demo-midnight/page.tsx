@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowRight, CheckCircle2, Shield, Truck, Headphones, Award } from 'lucide-react';
+import { ArrowRight, CheckCircle2, Shield, Truck } from 'lucide-react';
 import { MidnightHeader } from './components/MidnightHeader';
 import { MidnightFooter } from './components/MidnightFooter';
 import { PopularSection } from './components/PopularSection';
@@ -138,7 +138,7 @@ function HeroSection() {
       <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:40px_40px] opacity-20" />
 
       {/* Navigation Rail (Top) */}
-      <div className="relative z-30 w-full pt-4">
+      <div className="relative z-30 w-full">
         <CategoryRail />
       </div>
 
@@ -363,32 +363,27 @@ function FeaturesSection() {
   return (
     <section className="relative bg-slate-950 py-24 border-t border-slate-900">
       <div className="container mx-auto px-4">
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
           {[
             {
-              icon: Award,
-              title: 'Genuine Products',
-              desc: 'Authorized dealer. 100% authentic products with full warranty.',
+              icon: Shield,
+              title: 'Authorized Warranty',
+              desc: '12-24 Months official manufacturer warranty on all devices.',
             },
             {
               icon: Truck,
-              title: 'Express Delivery',
-              desc: 'Same-day delivery in Nairobi. Next-day countrywide.',
+              title: 'Secure Logistics',
+              desc: 'Insured shipping across Kenya with trusted courier partners.',
             },
             {
-              icon: Headphones,
-              title: 'Expert Support',
-              desc: 'Professional setup and dedicated after-sales support.',
-            },
-            {
-              icon: Shield,
-              title: 'Warranty Coverage',
-              desc: 'Official manufacturer warranty on all devices.',
+              icon: CheckCircle2,
+              title: 'Verified Authentic',
+              desc: 'Triple-checked supply chain. No grey imports, ever.',
             },
           ].map((feature) => (
             <div
               key={feature.title}
-              className="flex flex-col gap-4 rounded-2xl border border-slate-900 bg-slate-900/30 p-6 transition-all hover:border-blue-900/50 hover:bg-slate-900/50"
+              className="flex gap-4 rounded-2xl border border-slate-900 bg-slate-900/30 p-6"
             >
               <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-blue-950/50 text-blue-500">
                 <feature.icon className="h-6 w-6" />
@@ -399,40 +394,6 @@ function FeaturesSection() {
               </div>
             </div>
           ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function LocationSection() {
-  return (
-    <section className="relative bg-slate-950 pb-24 border-t border-slate-900">
-      <div className="container mx-auto px-4">
-        {/* Header */}
-        <div className="mb-8 text-center">
-          <h2 className="text-2xl font-bold text-white md:text-3xl">Visit Our Experience Center</h2>
-          <p className="mt-2 text-slate-400">Silicon Savannah Technologies, Nairobi</p>
-        </div>
-
-        {/* Map Container */}
-        <div className="overflow-hidden rounded-2xl border border-slate-800 bg-slate-900 shadow-2xl">
-          <iframe
-            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3988.819917806043!2d36.81520447496564!3d-1.282924598704944!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x182f10d227976e19%3A0x4688c7b7972df253!2sSilicon%20Savannah%20Technologies!5e0!3m2!1sen!2ske!4v1706780000000!5m2!1sen!2ske"
-            width="100%"
-            height="450"
-            style={{ border: 0, opacity: 0.8 }}
-            allowFullScreen
-            loading="lazy"
-            referrerPolicy="no-referrer-when-downgrade"
-            className="w-full transition-all duration-500 hover:opacity-100"
-          ></iframe>
-        </div>
-
-        <div className="mt-8 text-center">
-          <p className="text-sm text-slate-500">
-            Biashara Street, After 40 Plaza • Open Mon-Sat 8AM - 6PM
-          </p>
         </div>
       </div>
     </section>
@@ -465,7 +426,6 @@ function MidnightThemePage() {
       <CategoriesSection />
       <PopularSection />
       <FeaturesSection />
-      <LocationSection />
       <MidnightFooter />
     </main>
   );
