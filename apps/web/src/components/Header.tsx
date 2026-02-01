@@ -65,6 +65,7 @@ export function Header() {
       initial={{ y: -100 }}
       animate={{ y: 0 }}
       transition={{ duration: 0.5 }}
+      id="global-trustcart-header"
       className={cn(
         'fixed left-0 right-0 top-4 z-50 mx-auto flex w-[95%] max-w-7xl items-center justify-between rounded-2xl px-6 py-3 transition-all duration-300',
         scrolled

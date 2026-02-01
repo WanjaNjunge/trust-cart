@@ -71,27 +71,31 @@ interface Category {
 const CATEGORIES: Category[] = [
   {
     name: 'Laptops',
-    image: `${IMAGEKIT_BASE}/banners/banner-laptops.png`,
+    image:
+      'https://ik.imagekit.io/nr5uqiflj/trustcart/banners/collections-laptops.png?updatedAt=1769918312349',
     href: '/categories/laptops',
-    count: '24+ Products',
+    count: '24+ Models',
   },
   {
-    name: 'Phones',
-    image: `${IMAGEKIT_BASE}/banners/banner-phones.png`,
-    href: '/categories/phones',
-    count: '18+ Products',
+    name: 'Mobile Phones & Tablets',
+    image:
+      'https://ik.imagekit.io/nr5uqiflj/trustcart/banners/collections-mobile-phones-tablets.png?updatedAt=1769918311093',
+    href: '/categories/mobile',
+    count: '30+ Models',
   },
   {
-    name: 'Tablets',
-    image: `${IMAGEKIT_BASE}/banners/banner-tablets.png`,
-    href: '/categories/tablets',
-    count: '12+ Products',
+    name: 'Audio',
+    image:
+      'https://ik.imagekit.io/nr5uqiflj/trustcart/banners/collections-audio.png?updatedAt=1769918312889',
+    href: '/categories/audio',
+    count: '15+ Models',
   },
   {
     name: 'Accessories',
-    image: `${IMAGEKIT_BASE}/banners/banner-accessories.png`,
+    image:
+      'https://ik.imagekit.io/nr5uqiflj/trustcart/banners/collections-accessories.png?updatedAt=1769918313147',
     href: '/categories/accessories',
-    count: '50+ Products',
+    count: '50+ Items',
   },
 ];
 
