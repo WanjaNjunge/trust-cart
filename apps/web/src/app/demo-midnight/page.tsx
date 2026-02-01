@@ -8,6 +8,7 @@ import { ArrowRight, CheckCircle2, Shield, Truck } from 'lucide-react';
 import { MidnightHeader } from './components/MidnightHeader';
 import { MidnightFooter } from './components/MidnightFooter';
 import { PopularSection } from './components/PopularSection';
+import { CategoryRail } from './components/CategoryRail';
 
 const IMAGEKIT_BASE = 'https://ik.imagekit.io/nr5uqiflj/trustcart';
 
@@ -128,7 +129,7 @@ function HeroSection() {
 
   return (
     <section
-      className={`relative flex min-h-screen items-center justify-center overflow-hidden ${THEME.bg} pt-20`}
+      className={`relative flex min-h-screen flex-col justify-center overflow-hidden ${THEME.bg} pt-20`}
     >
       {/* Background Ambient Glow (Deep Royal Blue) */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(30,58,138,0.15),transparent_70%)]" />
@@ -136,21 +137,27 @@ function HeroSection() {
       {/* Subtle Grid */}
       <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:40px_40px] opacity-20" />
 
-      <div className="container relative z-10 mx-auto px-4">
-        <div className="grid items-center gap-16 lg:grid-cols-2">
+      {/* Navigation Rail (Top) */}
+      <div className="relative z-30 w-full pt-4">
+        <CategoryRail />
+      </div>
+
+      <div className="container relative z-10 mx-auto grow px-4">
+        <div className="grid h-full items-center gap-16 pb-20 lg:grid-cols-2">
           {/* Left Content */}
           <motion.div
+            key={product.id}
             initial="hidden"
             animate="visible"
             variants={staggerContainer}
             className="text-center lg:text-left"
           >
-            <motion.div variants={fadeInUp} className="mb-8 inline-flex">
+            <motion.div variants={fadeInUp} className="mb-6 inline-flex">
               <span
                 className={`inline-flex items-center gap-2 rounded-full border border-blue-900 bg-blue-950/30 px-4 py-2 text-sm text-blue-200 backdrop-blur-sm`}
               >
                 <span className="h-2 w-2 animate-pulse rounded-full bg-blue-500" />
-                Authorized Retailer
+                Featured Product
               </span>
             </motion.div>
 
@@ -158,40 +165,52 @@ function HeroSection() {
               variants={fadeInUp}
               className="text-5xl font-bold leading-[1.1] tracking-tight text-white md:text-6xl lg:text-7xl"
             >
-              Executive Tech.
-              <br />
-              <span
-                className={`bg-gradient-to-r ${THEME.accentGold} bg-clip-text text-transparent`}
-              >
-                Gold Standard.
-              </span>
+              <AnimatePresence mode="wait">
+                <motion.span
+                  key={product.name}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  className="block"
+                >
+                  {product.name}
+                </motion.span>
+              </AnimatePresence>
             </motion.h1>
 
-            <motion.p
-              variants={fadeInUp}
-              className={`mx-auto mt-6 max-w-lg text-lg ${THEME.textSecondary} lg:mx-0`}
-            >
-              Experience the pinnacle of performance. Verified authentic devices delivered securely
-              to your doorstep.
-            </motion.p>
+            <motion.div variants={fadeInUp} className="mt-6 max-w-lg text-lg text-slate-400">
+              <p className="font-medium text-white mb-2">{product.tagline}</p>
+              <div className="flex flex-wrap justify-center lg:justify-start gap-3">
+                {product.specs.map((spec) => (
+                  <span
+                    key={spec}
+                    className="inline-flex items-center rounded bg-slate-800/50 px-2.5 py-0.5 text-sm text-slate-300 border border-slate-700"
+                  >
+                    {spec}
+                  </span>
+                ))}
+              </div>
+            </motion.div>
 
             <motion.div
               variants={fadeInUp}
               className="mt-10 flex flex-col justify-center gap-4 sm:flex-row lg:justify-start"
             >
               <Link
-                href="/products"
+                href={product.href}
                 className={`group inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-r ${THEME.accentGold} px-8 py-4 text-lg font-bold text-black shadow-[0_0_20px_rgba(217,119,6,0.2)] transition-all hover:scale-105 hover:shadow-[0_0_40px_rgba(250,204,21,0.4)]`}
               >
-                Buy Now
+                Buy Now - {product.price}
                 <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
               </Link>
-              <Link
-                href="/categories/laptops"
-                className="inline-flex items-center justify-center gap-2 rounded-full border border-blue-800 px-8 py-4 text-lg font-medium text-blue-400 transition-all hover:border-blue-500 hover:text-blue-300"
-              >
-                View Specs
-              </Link>
+
+              <button className="inline-flex items-center justify-center gap-2 rounded-full border border-green-900/50 bg-green-900/10 px-8 py-4 text-lg font-medium text-green-400 transition-all hover:border-green-500 hover:bg-green-900/20 hover:text-green-300">
+                <span className="relative flex h-3 w-3">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75"></span>
+                  <span className="relative inline-flex h-3 w-3 rounded-full bg-green-500"></span>
+                </span>
+                Order on WhatsApp
+              </button>
             </motion.div>
 
             {/* Trust Indicators (Blue) */}
@@ -201,7 +220,7 @@ function HeroSection() {
             >
               <div className="flex items-center gap-2">
                 <Shield className="h-4 w-4 text-blue-500" />
-                <span>Official Warranty</span>
+                <span>2 Year Warranty</span>
               </div>
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="h-4 w-4 text-blue-500" />
