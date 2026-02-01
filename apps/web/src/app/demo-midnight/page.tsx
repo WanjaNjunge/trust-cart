@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowRight, CheckCircle2, Shield, Truck } from 'lucide-react';
 import { MidnightHeader } from './components/MidnightHeader';
 import { MidnightFooter } from './components/MidnightFooter';
+import { PopularSection } from './components/PopularSection';
 
 const IMAGEKIT_BASE = 'https://ik.imagekit.io/nr5uqiflj/trustcart';
 
@@ -404,6 +405,7 @@ function MidnightThemePage() {
       <MidnightHeader />
       <HeroSection />
       <CategoriesSection />
+      <PopularSection />
       <FeaturesSection />
       <MidnightFooter />
     </main>
