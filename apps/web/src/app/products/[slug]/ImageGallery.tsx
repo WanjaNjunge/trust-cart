@@ -35,31 +35,36 @@ export function ImageGallery({ images, productName }: ImageGalleryProps) {
     return null;
   }
 
+  const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
+    e.currentTarget.src = getPlaceholderImage(600, 600);
+  };
+
   return (
     <div className="space-y-4">
       {/* Main Image */}
-      <div className="relative aspect-square overflow-hidden rounded-xl bg-secondary-100">
+      <div className="relative aspect-square overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
         <Image
           src={selectedImage.url}
           alt={selectedImage.altText || productName}
           fill
-          className="object-cover"
+          className="object-contain p-4"
           sizes="(max-width: 1024px) 100vw, 50vw"
           priority
+          onError={handleImageError}
         />
       </div>
 
       {/* Thumbnails */}
       {displayImages.length > 1 && (
-        <div className="grid grid-cols-5 gap-2">
+        <div className="grid grid-cols-5 gap-3">
           {displayImages.map((image, index) => (
             <button
               key={image.id}
               onClick={() => setSelectedIndex(index)}
-              className={`relative aspect-square overflow-hidden rounded-lg ${
+              className={`relative aspect-square overflow-hidden rounded-xl bg-white border ${
                 index === selectedIndex
-                  ? 'ring-2 ring-primary-500 ring-offset-2'
-                  : 'hover:opacity-80'
+                  ? 'border-amber-500 ring-2 ring-amber-200 ring-offset-2'
+                  : 'border-slate-200 hover:border-amber-300'
               }`}
             >
               <Image

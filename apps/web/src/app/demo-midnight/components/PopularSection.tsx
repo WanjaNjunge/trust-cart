@@ -68,6 +68,7 @@ const getWhatsAppLink = (product: Product) => {
   return `https://wa.me/254700000000?text=${encodeURIComponent(message)}`;
 };
 
+
 function PopularCard({ product }: { product: Product }) {
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
@@ -150,6 +151,7 @@ function PopularCard({ product }: { product: Product }) {
               </span>
             ))}
           </div>
+
 
           <div className="mt-2 flex items-center justify-between">
             <div className="flex flex-col">

@@ -49,7 +49,7 @@ export function FilterSidebar({ categories, brands, currentFilters }: FilterSide
       {hasActiveFilters && (
         <button
           onClick={clearFilters}
-          className="w-full rounded-lg border border-secondary-300 px-4 py-2 text-sm font-medium text-secondary-700 hover:bg-secondary-50"
+          className="w-full rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors"
         >
           Clear All Filters
         </button>
@@ -57,15 +57,14 @@ export function FilterSidebar({ categories, brands, currentFilters }: FilterSide
 
       {/* Categories */}
       <div>
-        <h3 className="mb-3 font-semibold text-secondary-900">Category</h3>
+        <h3 className="mb-3 font-semibold text-slate-900">Category</h3>
         <div className="space-y-2">
           <button
             onClick={() => updateFilter('categoryId', undefined)}
-            className={`block w-full rounded-lg px-3 py-2 text-left text-sm ${
-              !currentFilters.categoryId
-                ? 'bg-primary-50 font-medium text-primary-700'
-                : 'text-secondary-600 hover:bg-secondary-50'
-            }`}
+            className={`block w-full rounded-lg px-3 py-2 text-left text-sm transition-colors ${!currentFilters.categoryId
+                ? 'bg-blue-100 font-bold text-blue-700'
+                : 'text-slate-600 hover:bg-slate-50'
+              }`}
           >
             All Categories
           </button>
@@ -73,14 +72,13 @@ export function FilterSidebar({ categories, brands, currentFilters }: FilterSide
             <button
               key={category.id}
               onClick={() => updateFilter('categoryId', category.id)}
-              className={`block w-full rounded-lg px-3 py-2 text-left text-sm ${
-                currentFilters.categoryId === category.id
-                  ? 'bg-primary-50 font-medium text-primary-700'
-                  : 'text-secondary-600 hover:bg-secondary-50'
-              }`}
+              className={`block w-full rounded-lg px-3 py-2 text-left text-sm transition-colors ${currentFilters.categoryId === category.id
+                  ? 'bg-blue-100 font-bold text-blue-700'
+                  : 'text-slate-600 hover:bg-slate-50'
+                }`}
             >
               {category.name}
-              <span className="ml-1 text-secondary-400">({category.productCount})</span>
+              <span className="ml-1 text-slate-400">({category.productCount})</span>
             </button>
           ))}
         </div>
@@ -88,15 +86,14 @@ export function FilterSidebar({ categories, brands, currentFilters }: FilterSide
 
       {/* Brands */}
       <div>
-        <h3 className="mb-3 font-semibold text-secondary-900">Brand</h3>
+        <h3 className="mb-3 font-semibold text-slate-900">Brand</h3>
         <div className="space-y-2">
           <button
             onClick={() => updateFilter('brandId', undefined)}
-            className={`block w-full rounded-lg px-3 py-2 text-left text-sm ${
-              !currentFilters.brandId
-                ? 'bg-primary-50 font-medium text-primary-700'
-                : 'text-secondary-600 hover:bg-secondary-50'
-            }`}
+            className={`block w-full rounded-lg px-3 py-2 text-left text-sm transition-colors ${!currentFilters.brandId
+                ? 'bg-blue-100 font-bold text-blue-700'
+                : 'text-slate-600 hover:bg-slate-50'
+              }`}
           >
             All Brands
           </button>
@@ -104,14 +101,13 @@ export function FilterSidebar({ categories, brands, currentFilters }: FilterSide
             <button
               key={brand.id}
               onClick={() => updateFilter('brandId', brand.id)}
-              className={`block w-full rounded-lg px-3 py-2 text-left text-sm ${
-                currentFilters.brandId === brand.id
-                  ? 'bg-primary-50 font-medium text-primary-700'
-                  : 'text-secondary-600 hover:bg-secondary-50'
-              }`}
+              className={`block w-full rounded-lg px-3 py-2 text-left text-sm transition-colors ${currentFilters.brandId === brand.id
+                  ? 'bg-blue-100 font-bold text-blue-700'
+                  : 'text-slate-600 hover:bg-slate-50'
+                }`}
             >
               {brand.name}
-              <span className="ml-1 text-secondary-400">({brand.productCount})</span>
+              <span className="ml-1 text-slate-400">({brand.productCount})</span>
             </button>
           ))}
         </div>
@@ -119,15 +115,14 @@ export function FilterSidebar({ categories, brands, currentFilters }: FilterSide
 
       {/* Condition */}
       <div>
-        <h3 className="mb-3 font-semibold text-secondary-900">Condition</h3>
+        <h3 className="mb-3 font-semibold text-slate-900">Condition</h3>
         <div className="space-y-2">
           <button
             onClick={() => updateFilter('condition', undefined)}
-            className={`block w-full rounded-lg px-3 py-2 text-left text-sm ${
-              !currentFilters.condition
-                ? 'bg-primary-50 font-medium text-primary-700'
-                : 'text-secondary-600 hover:bg-secondary-50'
-            }`}
+            className={`block w-full rounded-lg px-3 py-2 text-left text-sm transition-colors ${!currentFilters.condition
+                ? 'bg-blue-100 font-bold text-blue-700'
+                : 'text-slate-600 hover:bg-slate-50'
+              }`}
           >
             Any Condition
           </button>
@@ -135,11 +130,10 @@ export function FilterSidebar({ categories, brands, currentFilters }: FilterSide
             <button
               key={condition}
               onClick={() => updateFilter('condition', condition)}
-              className={`block w-full rounded-lg px-3 py-2 text-left text-sm ${
-                currentFilters.condition === condition
-                  ? 'bg-primary-50 font-medium text-primary-700'
-                  : 'text-secondary-600 hover:bg-secondary-50'
-              }`}
+              className={`block w-full rounded-lg px-3 py-2 text-left text-sm transition-colors ${currentFilters.condition === condition
+                  ? 'bg-blue-100 font-bold text-blue-700'
+                  : 'text-slate-600 hover:bg-slate-50'
+                }`}
             >
               {getConditionLabel(condition)}
             </button>
@@ -149,10 +143,10 @@ export function FilterSidebar({ categories, brands, currentFilters }: FilterSide
 
       {/* Price Range */}
       <div>
-        <h3 className="mb-3 font-semibold text-secondary-900">Price Range</h3>
+        <h3 className="mb-3 font-semibold text-slate-900">Price Range</h3>
         <div className="space-y-3">
           <div>
-            <label htmlFor="priceMin" className="text-xs text-secondary-500">
+            <label htmlFor="priceMin" className="text-xs font-medium text-slate-500">
               Min (KES)
             </label>
             <input
@@ -160,12 +154,12 @@ export function FilterSidebar({ categories, brands, currentFilters }: FilterSide
               id="priceMin"
               placeholder="0"
               defaultValue={currentFilters.priceMin}
-              className="input mt-1 text-sm"
+              className="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-amber-500 focus:ring-amber-500 sm:text-sm"
               onBlur={(e) => updateFilter('priceMin', e.target.value || undefined)}
             />
           </div>
           <div>
-            <label htmlFor="priceMax" className="text-xs text-secondary-500">
+            <label htmlFor="priceMax" className="text-xs font-medium text-slate-500">
               Max (KES)
             </label>
             <input
@@ -173,7 +167,7 @@ export function FilterSidebar({ categories, brands, currentFilters }: FilterSide
               id="priceMax"
               placeholder="Any"
               defaultValue={currentFilters.priceMax}
-              className="input mt-1 text-sm"
+              className="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-amber-500 focus:ring-amber-500 sm:text-sm"
               onBlur={(e) => updateFilter('priceMax', e.target.value || undefined)}
             />
           </div>

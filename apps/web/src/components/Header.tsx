@@ -4,11 +4,11 @@ import Link from 'next/link';
 import { useState, useEffect, useCallback } from 'react';
 import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
+import { ShoppingBag, Search, Menu, X } from 'lucide-react';
 import { isAuthenticated, getStoredUser, clearToken } from '@/lib/auth';
 import { getCart } from '@/lib/api';
 import type { User } from '@/lib/types';
 import { cn } from '@/lib/utils';
-import { MagneticButton } from './ui/MagneticButton';
 
 export function Header() {
   const pathname = usePathname();
@@ -67,163 +67,163 @@ export function Header() {
       transition={{ duration: 0.5 }}
       id="global-trustcart-header"
       className={cn(
-        'fixed left-0 right-0 top-4 z-50 mx-auto flex w-[95%] max-w-7xl items-center justify-between rounded-2xl px-6 py-3 transition-all duration-300',
+        'fixed left-0 right-0 top-0 z-50 transition-all duration-300 transform-gpu',
         scrolled
-          ? 'glass shadow-md bg-white/80 dark:bg-black/80'
-          : 'bg-transparent backdrop-blur-sm border border-transparent',
+          ? 'bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-sm'
+          : 'bg-white/80 backdrop-blur-sm border-b border-transparent'
       )}
     >
-      {/* Logo */}
-      <Link href="/" className="flex items-center gap-2">
-        <span className="font-display text-xl font-bold tracking-tight text-primary">
-          TrustCart
-        </span>
-      </Link>
+      <div className="mx-auto flex h-20 max-w-7xl items-center justify-between gap-8 px-4 sm:px-6 lg:px-8">
+        {/* Logo */}
+        <Link href="/" className="flex shrink-0 items-center gap-2">
+          <span className="text-xl font-bold tracking-tight text-slate-900">
+            Trust<span className="text-blue-600">Cart</span>
+          </span>
+        </Link>
 
-      {/* Desktop Nav */}
-      <nav className="hidden items-center gap-8 md:flex">
-        {[
-          { name: 'Products', href: '/products' },
-          { name: 'Laptops', href: '/categories/laptops' },
-          { name: 'Phones', href: '/categories/phones' },
-        ].map((item) => (
-          <Link
-            key={item.name}
-            href={item.href}
-            className={cn(
-              'text-sm font-medium transition-colors hover:text-primary',
-              pathname === item.href ? 'text-primary' : 'text-muted-foreground',
-            )}
-          >
-            {item.name}
-          </Link>
-        ))}
-      </nav>
-
-      {/* Actions */}
-      <div className="flex items-center gap-4">
-        {/* Search Trigger (Mobile/Desktop) - Simplified for now */}
-        <button className="text-muted-foreground hover:text-primary">
-          <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+        {/* Desktop Search Bar (Centered & Wide) */}
+        <div className="hidden flex-1 items-center justify-center md:flex">
+          <div className="relative w-full max-w-2xl">
+            <input
+              type="text"
+              placeholder="Search for laptops, phones, or accessories..."
+              className="w-full rounded-full border border-slate-200 bg-slate-100 py-3 pl-12 pr-4 text-sm text-slate-900 placeholder-slate-500 transition-all focus:border-blue-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20"
             />
-          </svg>
-        </button>
+            <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
+          </div>
+        </div>
 
-        {/* Cart */}
-        <MagneticButton>
-          <Link
-            href="/cart"
-            className="relative flex h-10 w-10 items-center justify-center rounded-full bg-secondary/10 text-secondary transition-colors hover:bg-secondary/20"
-          >
-            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
-              />
-            </svg>
-            {cartCount > 0 && (
-              <motion.span
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-white shadow-sm"
-              >
-                {cartCount > 99 ? '99+' : cartCount}
-              </motion.span>
-            )}
-          </Link>
-        </MagneticButton>
+        {/* Actions */}
+        <div className="flex items-center gap-6">
+          {/* Mobile Search Trigger */}
+          <button className="text-slate-500 hover:text-blue-600 md:hidden">
+            <Search className="h-6 w-6" />
+          </button>
 
-        {/* Auth */}
-        <div className="hidden md:flex md:items-center md:gap-3">
+          {/* Account */}
           {user ? (
-            <>
+            <div className="hidden flex-col items-center gap-1 md:flex">
               <Link
                 href="/account"
-                className="text-sm font-medium text-foreground hover:text-primary"
+                className="text-xs font-semibold uppercase tracking-wider text-slate-900 hover:text-blue-600"
               >
                 {user.firstName}
               </Link>
               <button
                 onClick={handleLogout}
-                className="text-sm font-medium text-muted-foreground hover:text-primary"
+                className="text-[10px] uppercase tracking-wider text-slate-500 hover:text-red-500"
               >
                 Logout
               </button>
-            </>
+            </div>
           ) : (
             <Link
               href="/login"
-              className="btn-primary rounded-full px-5 py-2 text-sm shadow-lg shadow-primary/20 transition-transform hover:scale-105"
+              className="flex flex-col items-center gap-1 text-slate-500 transition-colors hover:text-blue-600"
             >
-              Login
+              <div className="h-6 w-6 rounded-full border border-current p-0.5">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="h-full w-full"
+                >
+                  <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
+                  <circle cx="12" cy="7" r="4" />
+                </svg>
+              </div>
+              <span className="hidden text-[10px] uppercase tracking-wider font-semibold lg:block">
+                Sign In
+              </span>
             </Link>
           )}
-        </div>
 
-        {/* Mobile Menu Button */}
-        <button className="md:hidden text-foreground" onClick={() => setIsMenuOpen(!isMenuOpen)}>
-          <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d={isMenuOpen ? 'M6 18L18 6M6 6l12 12' : 'M4 6h16M4 12h16M4 18h16'}
-            />
-          </svg>
-        </button>
+          {/* Cart */}
+          <Link
+            href="/cart"
+            className="group flex flex-col items-center gap-1 text-slate-500 transition-colors hover:text-blue-600"
+          >
+            <div className="relative">
+              <ShoppingBag className="h-6 w-6" />
+              {cartCount > 0 && (
+                <span className="absolute -right-1.5 -top-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-blue-600 text-[10px] font-bold text-white shadow-sm ring-2 ring-white">
+                  {cartCount > 99 ? '99+' : cartCount}
+                </span>
+              )}
+            </div>
+            <span className="hidden text-[10px] uppercase tracking-wider font-semibold lg:block">
+              Cart
+            </span>
+          </Link>
+
+          {/* Mobile Menu Button */}
+          <button className="text-slate-900 md:hidden" onClick={() => setIsMenuOpen(!isMenuOpen)}>
+            {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+          </button>
+        </div>
       </div>
 
       {/* Mobile Menu Overlay */}
       <AnimatePresence>
         {isMenuOpen && (
           <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.95 }}
-            className="absolute right-0 top-16 w-64 origin-top-right rounded-xl glass p-4 shadow-xl md:hidden bg-white/95 dark:bg-black/95"
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            className="absolute left-0 right-0 top-20 border-b border-slate-200 bg-white px-4 py-4 md:hidden shadow-xl"
           >
+            {/* Mobile Search Input */}
+            <div className="mb-6 relative">
+              <input
+                type="text"
+                placeholder="Search..."
+                className="w-full rounded-lg border border-slate-200 bg-slate-50 py-3 pl-10 pr-4 text-slate-900 placeholder-slate-400 focus:border-blue-500 focus:outline-none"
+              />
+              <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
+            </div>
+
             <div className="flex flex-col gap-4">
               <Link
                 href="/products"
-                className="text-sm font-medium text-foreground"
+                className="text-base font-medium text-slate-600 hover:text-blue-600"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Products
               </Link>
               <Link
                 href="/categories/laptops"
-                className="text-sm font-medium text-foreground"
+                className="text-base font-medium text-slate-600 hover:text-blue-600"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Laptops
               </Link>
               <Link
                 href="/categories/phones"
-                className="text-sm font-medium text-foreground"
+                className="text-base font-medium text-slate-600 hover:text-blue-600"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Phones
               </Link>
-              <hr className="border-border" />
+              <hr className="border-slate-100" />
               {user ? (
                 <>
                   <Link
                     href="/account"
-                    className="text-sm font-medium text-foreground"
+                    className="text-base font-medium text-slate-600 hover:text-blue-600"
                     onClick={() => setIsMenuOpen(false)}
                   >
-                    Account
+                    Account ({user.firstName})
                   </Link>
                   <button
-                    onClick={handleLogout}
-                    className="text-left text-sm font-medium text-muted-foreground"
+                    onClick={() => {
+                      handleLogout();
+                      setIsMenuOpen(false);
+                    }}
+                    className="text-left text-base font-medium text-red-500 hover:text-red-600"
                   >
                     Logout
                   </button>
@@ -231,7 +231,7 @@ export function Header() {
               ) : (
                 <Link
                   href="/login"
-                  className="btn-primary text-center"
+                  className="flex w-full items-center justify-center rounded-full bg-blue-600 py-3 text-sm font-medium text-white shadow-lg shadow-blue-200"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   Login
@@ -244,3 +244,4 @@ export function Header() {
     </motion.header>
   );
 }
+

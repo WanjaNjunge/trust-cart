@@ -30,7 +30,7 @@ export default async function ProductsPage({
 }: ProductsPageProps): Promise<JSX.Element> {
   const page = Number(searchParams.page) || 1;
 
-  // Fetch products, categories, and brands in parallel
+  // Fetch products and brands with error handling
   const [productsResponse, categoriesResponse, brandsResponse] = await Promise.all([
     getProducts({
       page,
@@ -41,6 +41,18 @@ export default async function ProductsPage({
       priceMin: searchParams.priceMin ? Number(searchParams.priceMin) : undefined,
       priceMax: searchParams.priceMax ? Number(searchParams.priceMax) : undefined,
       sort: searchParams.sort,
+    }).catch(err => {
+      console.error("Failed to fetch products:", err);
+      // Return fallback structure matching ProductListResponse
+      return {
+        data: [],
+        pagination: {
+          totalItems: 0,
+          totalPages: 1,
+          currentPage: 1,
+          limit: 12
+        }
+      };
     }),
     getCategories().catch(() => ({ data: [] })),
     getBrands().catch(() => ({ data: [] })),
@@ -60,12 +72,12 @@ export default async function ProductsPage({
   if (searchParams.sort) queryParams.sort = searchParams.sort;
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+    <div className="mx-auto max-w-7xl px-4 pt-24 pb-16 sm:px-6 lg:px-8">
       <Breadcrumbs items={[{ label: 'Products' }]} />
 
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-secondary-900">All Products</h1>
-        <p className="mt-2 text-secondary-600">{pagination.totalItems} products found</p>
+        <h1 className="text-3xl font-bold text-slate-900">All Products</h1>
+        <p className="mt-2 text-slate-600">{pagination.totalItems} products found</p>
       </div>
 
       <div className="flex flex-col gap-8 lg:flex-row">

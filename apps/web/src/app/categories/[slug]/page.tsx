@@ -83,26 +83,34 @@ export default async function CategoryPage({
   if (searchParams.sort) queryParams.sort = searchParams.sort;
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+    <div className="mx-auto max-w-7xl px-4 pt-24 pb-16 sm:px-6 lg:px-8">
       <Breadcrumbs items={[{ label: 'Products', href: '/products' }, { label: category.name }]} />
 
       {/* Category Header */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-secondary-900">{category.name}</h1>
-        {category.description && <p className="mt-2 text-secondary-600">{category.description}</p>}
-        <p className="mt-1 text-sm text-secondary-500">{pagination.totalItems} products</p>
+      <div className="mb-10 rounded-3xl border border-slate-200 bg-white/60 p-8 shadow-sm backdrop-blur-md">
+        <h1 className="text-4xl font-extrabold text-slate-900 tracking-tight">{category.name}</h1>
+        {category.description && <p className="mt-3 text-lg text-slate-600 max-w-2xl">{category.description}</p>}
+
+        <div className="mt-6 flex items-center gap-4 border-t border-slate-100 pt-4">
+          <span className="inline-flex items-center rounded-full bg-blue-50 px-3 py-1 text-sm font-semibold text-blue-700">
+            {pagination.totalItems} Products
+          </span>
+          <span className="text-sm text-slate-400">
+            Sorted by Relevance
+          </span>
+        </div>
       </div>
 
       {/* Subcategories */}
       {category.children && category.children.length > 0 && (
-        <div className="mb-8">
-          <h2 className="mb-4 font-semibold text-secondary-900">Subcategories</h2>
-          <div className="flex flex-wrap gap-2">
+        <div className="mb-10">
+          <h2 className="mb-4 text-sm font-bold uppercase tracking-wider text-slate-400">Related Subcategories</h2>
+          <div className="flex flex-wrap gap-3">
             {category.children.map((child) => (
               <Link
                 key={child.id}
                 href={`/categories/${child.slug}`}
-                className="rounded-full bg-secondary-100 px-4 py-2 text-sm text-secondary-700 hover:bg-secondary-200"
+                className="rounded-full border border-slate-200 bg-white px-5 py-2 text-sm font-medium text-slate-700 hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700 transition-all shadow-sm"
               >
                 {child.name}
               </Link>
@@ -125,13 +133,13 @@ export default async function CategoryPage({
           searchParams.condition ||
           searchParams.priceMin ||
           searchParams.priceMax) && (
-          <Link
-            href={`/categories/${params.slug}`}
-            className="text-sm text-primary-600 hover:text-primary-700"
-          >
-            Clear Filters
-          </Link>
-        )}
+            <Link
+              href={`/categories/${params.slug}`}
+              className="text-sm text-primary-600 hover:text-primary-700"
+            >
+              Clear Filters
+            </Link>
+          )}
       </div>
 
       {/* Product Grid */}

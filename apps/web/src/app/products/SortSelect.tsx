@@ -21,7 +21,7 @@ export function SortSelect({ currentSort }: SortSelectProps): JSX.Element {
       id="sort"
       name="sort"
       defaultValue={currentSort || ''}
-      className="input w-auto py-1.5 text-sm"
+      className="rounded-md border-slate-300 py-1.5 text-sm text-slate-700 shadow-sm focus:border-amber-500 focus:ring-amber-500"
       onChange={handleChange}
     >
       <option value="">Newest</option>

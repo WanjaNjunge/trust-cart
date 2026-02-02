@@ -5,11 +5,11 @@ import { getProductBySlug } from '@/lib/api';
 import {
   formatPrice,
   getConditionLabel,
-  getConditionColor,
   getDiscountPercentage,
 } from '@/lib/utils';
 import { ImageGallery } from './ImageGallery';
-import { AddToCartButton } from './AddToCartButton';
+import { ProductActions } from './AddToCartButton';
+import { Check, Shield, Truck, RotateCcw } from 'lucide-react';
 
 interface ProductPageProps {
   params: {
@@ -61,154 +61,181 @@ export default async function ProductPage({ params }: ProductPageProps) {
 
   breadcrumbItems.push({ label: product.name });
 
+  // Generate Key Features (mock if none exist)
+  const keyFeatures = product.attributes.slice(0, 4);
+
   return (
-    <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+
+    <div className="mx-auto max-w-7xl px-4 pt-28 pb-16 sm:px-6 lg:px-8">
       <Breadcrumbs items={breadcrumbItems} />
 
-      <div className="mt-6 grid gap-8 lg:grid-cols-2">
-        {/* Image Gallery */}
-        <div>
+      {/* Main Grid: Gallery & Buying Options */}
+      <div className="mt-8 grid gap-12 lg:grid-cols-12">
+        {/* Image Gallery (Left - 7 cols) */}
+        <div className="lg:col-span-8">
           <ImageGallery images={product.images || []} productName={product.name} />
         </div>
 
-        {/* Product Info */}
-        <div>
-          {/* Brand & Category */}
-          <div className="mb-2 flex items-center gap-2 text-sm text-secondary-500">
-            {product.brand && <span>{product.brand.name}</span>}
-            {product.brand && product.category && <span>•</span>}
-            {product.category && <span>{product.category.name}</span>}
+        {/* Product Actions (Right - 4 cols) */}
+        <div className="lg:col-span-4 flex flex-col gap-6">
+
+          {/* Header Section */}
+          <div>
+            <div className="mb-2 flex items-center gap-2 text-sm font-medium text-slate-500">
+              {product.brand && <span className="uppercase tracking-wider text-slate-700">{product.brand.name}</span>}
+              {product.brand && product.category && <span className="text-slate-300">•</span>}
+              {product.category && <span className="text-blue-600">{product.category.name}</span>}
+            </div>
+
+            <h1 className="text-3xl font-bold text-slate-900 leading-tight">{product.name}</h1>
+
+            <div className="mt-3 flex items-center gap-4">
+              <span className="inline-flex items-center rounded-md bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-600 border border-slate-200">
+                {getConditionLabel(product.condition)}
+              </span>
+              <span className="text-xs text-slate-400 font-mono">SKU: {product.sku}</span>
+            </div>
           </div>
 
-          {/* Title */}
-          <h1 className="text-2xl font-bold text-secondary-900 sm:text-3xl">{product.name}</h1>
-
-          {/* SKU */}
-          <p className="mt-1 text-sm text-secondary-400">SKU: {product.sku}</p>
-
-          {/* Condition Badge */}
-          <div className="mt-4">
-            <span
-              className={`inline-flex rounded-full px-3 py-1 text-sm font-medium ${getConditionColor(product.condition)}`}
-            >
-              {getConditionLabel(product.condition)}
-            </span>
-          </div>
-
-          {/* Price */}
-          <div className="mt-6">
-            <div className="flex items-baseline gap-3">
-              <span className="text-3xl font-bold text-secondary-900">
+          {/* Pricing Section */}
+          <div className="border-b border-slate-100 pb-6">
+            <div className="flex items-center gap-3">
+              <span className="text-3xl font-bold text-slate-900">
                 {formatPrice(product.price)}
               </span>
               {product.compareAtPrice && (
                 <>
-                  <span className="text-xl text-secondary-400 line-through">
+                  <span className="text-lg text-slate-400 line-through">
                     {formatPrice(product.compareAtPrice)}
                   </span>
-                  <span className="rounded-full bg-red-100 px-2 py-0.5 text-sm font-semibold text-red-700">
-                    Save {discountPercent}%
+                  <span className="ml-2 rounded bg-red-50 px-2 py-1 text-xs font-bold text-red-600 border border-red-100">
+                    -{discountPercent}%
                   </span>
                 </>
               )}
             </div>
-            <p className="mt-1 text-sm text-secondary-500">VAT inclusive</p>
+            <p className="mt-1 text-sm text-slate-500">Price inclusive of VAT</p>
+
+            <div className="mt-4">
+              {product.isInStock ? (
+                <div className="flex items-center gap-2 text-emerald-600 text-sm font-medium">
+                  <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+                  Available in stock
+                </div>
+              ) : (
+                <div className="flex items-center gap-2 text-red-500 text-sm font-medium">
+                  <div className="h-2 w-2 rounded-full bg-red-500" />
+                  Out of stock
+                </div>
+              )}
+            </div>
           </div>
 
-          {/* Stock Status */}
-          <div className="mt-6">
-            {product.isInStock ? (
-              <div className="flex items-center gap-2 text-green-600">
-                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M5 13l4 4L19 7"
-                  />
-                </svg>
-                <span className="font-medium">In Stock</span>
-                {product.availableQuantity && product.availableQuantity <= 5 && (
-                  <span className="text-sm text-secondary-500">
-                    (Only {product.availableQuantity} left)
-                  </span>
-                )}
-              </div>
-            ) : (
-              <div className="flex items-center gap-2 text-red-500">
-                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
-                <span className="font-medium">Out of Stock</span>
-              </div>
-            )}
-          </div>
+          {/* Key Features (Quick Summary) */}
+          {keyFeatures.length > 0 && (
+            <div className="py-2">
+              <h3 className="text-sm font-semibold text-slate-900 mb-2">Key Features</h3>
+              <ul className="grid gap-2">
+                {keyFeatures.map((attr, i) => (
+                  <li key={i} className="flex items-start gap-2 text-sm text-slate-600">
+                    <div className="mt-1 h-1.5 w-1.5 rounded-full bg-slate-400 shrink-0" />
+                    <span><span className="font-medium text-slate-800">{attr.name}:</span> {attr.value}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
 
-          {/* Add to Cart Button */}
-          <div className="mt-8">
-            <AddToCartButton
+          {/* Action Area */}
+          <div className="pt-2">
+            <ProductActions
               productId={product.id}
               productName={product.name}
+              productPrice={product.price}
+              slug={params.slug}
               isInStock={product.isInStock}
               maxQuantity={product.availableQuantity}
             />
-            <p className="mt-2 text-center text-xs text-secondary-500">
-              Free delivery on orders over KES 10,000
-            </p>
           </div>
 
-          {/* Warranty */}
-          {product.warrantyMonths > 0 && (
-            <div className="mt-6 flex items-center gap-3 rounded-lg bg-primary-50 p-4">
-              <svg
-                className="h-8 w-8 text-primary-600"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
-                />
-              </svg>
+          {/* Assurance Icons */}
+          <div className="grid grid-cols-2 gap-4 pt-6 border-t border-slate-100">
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-50 text-blue-600">
+                <Shield className="h-5 w-5" />
+              </div>
               <div>
-                <p className="font-semibold text-primary-900">
-                  {product.warrantyMonths} Month Warranty
-                </p>
-                <p className="text-sm text-primary-700">Covered by TrustCart guarantee</p>
+                <p className="text-xs font-bold text-slate-900">{product.warrantyMonths} Month Warranty</p>
+                <p className="text-[10px] text-slate-500">Official Coverage</p>
               </div>
             </div>
-          )}
-
-          {/* Description */}
-          <div className="mt-8">
-            <h2 className="text-lg font-semibold text-secondary-900">Description</h2>
-            <p className="mt-3 text-secondary-600 leading-relaxed">{product.description}</p>
-          </div>
-
-          {/* Specifications */}
-          {product.attributes && product.attributes.length > 0 && (
-            <div className="mt-8">
-              <h2 className="text-lg font-semibold text-secondary-900">Specifications</h2>
-              <dl className="mt-4 divide-y divide-secondary-200">
-                {product.attributes.map((attr, index) => (
-                  <div key={index} className="flex py-3">
-                    <dt className="w-1/3 text-sm font-medium text-secondary-500">{attr.name}</dt>
-                    <dd className="w-2/3 text-sm text-secondary-900">{attr.value}</dd>
-                  </div>
-                ))}
-              </dl>
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-orange-50 text-orange-600">
+                <Truck className="h-5 w-5" />
+              </div>
+              <div>
+                <p className="text-xs font-bold text-slate-900">Express Delivery</p>
+                <p className="text-[10px] text-slate-500">Within Nairobi</p>
+              </div>
             </div>
-          )}
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-green-50 text-green-600">
+                <Check className="h-5 w-5" />
+              </div>
+              <div>
+                <p className="text-xs font-bold text-slate-900">Genuine Products</p>
+                <p className="text-[10px] text-slate-500">100% Original</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-purple-50 text-purple-600">
+                <RotateCcw className="h-5 w-5" />
+              </div>
+              <div>
+                <p className="text-xs font-bold text-slate-900">Easy Returns</p>
+                <p className="text-[10px] text-slate-500">7 Day Policy</p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
+
+      {/* Detailed Info Section (Full Width) */}
+      <div className="mt-16 sm:mt-24">
+        <div className="grid gap-12 lg:grid-cols-12">
+
+          {/* Description */}
+          <div className="lg:col-span-7">
+            <h2 className="text-2xl font-bold text-slate-900 mb-6">Product Description</h2>
+            <div className="prose prose-slate prose-lg text-slate-600 leading-relaxed max-w-none">
+              <p>{product.description}</p>
+              {/* Placeholder for future rich text */}
+              <br />
+              <p>Experience the power and elegance of the {product.name}. Designed for professionals and creatives alike, this device delivers exceptional performance in a sleek, portable form factor.</p>
+            </div>
+          </div>
+
+          {/* Tech Specs */}
+          <div className="lg:col-span-5">
+            <h2 className="text-xl font-bold text-slate-900 mb-6">Technical Specifications</h2>
+            {product.attributes && product.attributes.length > 0 ? (
+              <div className="rounded-2xl border border-slate-100 bg-slate-50 overflow-hidden">
+                <dl className="divide-y divide-slate-200/50">
+                  {product.attributes.map((attr, index) => (
+                    <div key={index} className="grid grid-cols-3 gap-4 px-6 py-4">
+                      <dt className="text-sm font-medium text-slate-900">{attr.name}</dt>
+                      <dd className="col-span-2 text-sm text-slate-600">{attr.value}</dd>
+                    </div>
+                  ))}
+                </dl>
+              </div>
+            ) : (
+              <p className="text-slate-500 italic">No detailed specifications available.</p>
+            )}
+          </div>
+        </div>
+      </div>
+
     </div>
   );
 }

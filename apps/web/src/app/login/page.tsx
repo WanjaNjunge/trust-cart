@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { login } from '@/lib/api';
 import { setToken, setStoredUser, isAuthenticated } from '@/lib/auth';
+import { ArrowRight } from 'lucide-react';
 
 function LoginForm() {
   const router = useRouter();
@@ -59,30 +60,34 @@ function LoginForm() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-secondary-50 to-secondary-100 px-4 py-12">
-      <div className="w-full max-w-md">
-        <div className="rounded-2xl bg-white p-8 shadow-xl">
+    <div className="flex min-h-screen w-full items-center justify-center px-4 py-20">
+      <div className="w-full max-w-[440px]">
+        {/* Glass Container */}
+        <div className="relative overflow-hidden rounded-2xl border border-stone-200 bg-white/90 p-8 shadow-xl backdrop-blur-xl transition-all duration-500 hover:shadow-stone-200/50">
+
+          {/* Subtle Top Accent (Dark Red to Gold) */}
+          <div className="absolute top-0 left-0 h-1 w-full bg-gradient-to-r from-red-900 via-amber-600 to-amber-400 opacity-80" />
+
           <div className="mb-8 text-center">
-            <Link href="/" className="text-2xl font-bold text-primary-600">
-              TrustCart
-            </Link>
-            <h1 className="mt-4 text-2xl font-bold text-secondary-900">Welcome Back</h1>
-            <p className="mt-2 text-secondary-500">Sign in to your account</p>
+            <h1 className="text-2xl font-bold text-slate-900">Welcome Back</h1>
+            <p className="mt-2 text-sm text-slate-500">Sign in to your account</p>
           </div>
 
           {successMessage && (
-            <div className="mb-4 rounded-lg bg-green-50 p-4 text-sm text-green-700">
+            <div className="mb-6 rounded-lg border border-green-200 bg-green-50 p-4 text-xs font-medium text-green-800 shadow-sm">
               {successMessage}
             </div>
           )}
 
           {error && (
-            <div className="mb-4 rounded-lg bg-red-50 p-4 text-sm text-red-700">{error}</div>
+            <div className="mb-6 rounded-lg border border-red-200 bg-red-50 p-4 text-xs font-medium text-red-800 shadow-sm">
+              {error}
+            </div>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-5">
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-secondary-700">
+            <div className="space-y-1.5">
+              <label htmlFor="email" className="block text-xs font-semibold text-slate-700 ml-1">
                 Email Address
               </label>
               <input
@@ -92,19 +97,19 @@ function LoginForm() {
                 required
                 value={formData.email}
                 onChange={handleChange}
-                className="mt-1 block w-full rounded-lg border border-secondary-300 px-4 py-2.5 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20"
+                className="block w-full rounded-xl border border-slate-200 bg-slate-50/50 px-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 transition-all focus:border-amber-400 focus:bg-white focus:outline-none focus:ring-4 focus:ring-amber-500/10"
                 placeholder="you@example.com"
               />
             </div>
 
-            <div>
-              <div className="flex items-center justify-between">
-                <label htmlFor="password" className="block text-sm font-medium text-secondary-700">
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between ml-1">
+                <label htmlFor="password" className="block text-xs font-semibold text-slate-700">
                   Password
                 </label>
                 <Link
                   href="/forgot-password"
-                  className="text-sm font-medium text-primary-600 hover:text-primary-500"
+                  className="text-xs font-medium text-red-800 hover:text-red-900 hover:underline transition-colors"
                 >
                   Forgot password?
                 </Link>
@@ -116,37 +121,44 @@ function LoginForm() {
                 required
                 value={formData.password}
                 onChange={handleChange}
-                className="mt-1 block w-full rounded-lg border border-secondary-300 px-4 py-2.5 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20"
+                className="block w-full rounded-xl border border-slate-200 bg-slate-50/50 px-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 transition-all focus:border-amber-400 focus:bg-white focus:outline-none focus:ring-4 focus:ring-amber-500/10"
               />
             </div>
 
+            {/* Gold Action Button */}
             <button
               type="submit"
               disabled={isLoading}
-              className="btn-primary w-full py-3 text-base disabled:cursor-not-allowed disabled:opacity-50"
+              className="group relative w-full overflow-hidden rounded-xl bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 py-3 text-sm font-bold text-slate-900 shadow-lg shadow-amber-500/20 transition-all hover:scale-[1.02] hover:shadow-amber-500/40 disabled:cursor-not-allowed disabled:opacity-70"
             >
-              {isLoading ? 'Signing in...' : 'Sign In'}
+              <span className="relative z-10 flex items-center justify-center gap-2">
+                {isLoading ? 'Signing in...' : 'Sign In'}
+                {!isLoading && (
+                  <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                )}
+              </span>
+              <span className="absolute inset-0 bg-white/20 opacity-0 transition-opacity group-hover:opacity-100" />
             </button>
           </form>
 
-          <div className="mt-6 text-center">
-            <p className="text-sm text-secondary-600">
+          <div className="mt-6 pt-6 border-t border-slate-100 text-center">
+            <p className="text-sm text-slate-600">
               Don&apos;t have an account?{' '}
               <Link
                 href="/register"
-                className="font-medium text-primary-600 hover:text-primary-500"
+                className="text-red-800 hover:text-red-900 hover:underline transition-colors"
               >
-                Create one
+                Create Account
               </Link>
             </p>
           </div>
 
-          <div className="mt-6 border-t border-secondary-200 pt-6">
-            <p className="text-center text-xs text-secondary-500">
-              Test credentials:{' '}
-              <code className="bg-secondary-100 px-1 py-0.5 rounded">admin@trustcart.co.ke</code> /{' '}
-              <code className="bg-secondary-100 px-1 py-0.5 rounded">Test123!</code>
-            </p>
+          <div className="mt-6 rounded-lg bg-slate-50 p-4 text-center">
+            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Demo Credentials</p>
+            <div className="flex flex-col gap-1 text-xs text-slate-600 font-mono">
+              <span>admin@trustcart.co.ke</span>
+              <span>Test123!</span>
+            </div>
           </div>
         </div>
       </div>
