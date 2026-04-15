@@ -89,22 +89,24 @@ export default async function CategoryPage({
       {/* Category Header */}
       <div className="mb-10 rounded-3xl border border-slate-200 bg-white/60 p-8 shadow-sm backdrop-blur-md">
         <h1 className="text-4xl font-extrabold text-slate-900 tracking-tight">{category.name}</h1>
-        {category.description && <p className="mt-3 text-lg text-slate-600 max-w-2xl">{category.description}</p>}
+        {category.description && (
+          <p className="mt-3 text-lg text-slate-600 max-w-2xl">{category.description}</p>
+        )}
 
         <div className="mt-6 flex items-center gap-4 border-t border-slate-100 pt-4">
           <span className="inline-flex items-center rounded-full bg-blue-50 px-3 py-1 text-sm font-semibold text-blue-700">
             {pagination.totalItems} Products
           </span>
-          <span className="text-sm text-slate-400">
-            Sorted by Relevance
-          </span>
+          <span className="text-sm text-slate-400">Sorted by Relevance</span>
         </div>
       </div>
 
       {/* Subcategories */}
       {category.children && category.children.length > 0 && (
         <div className="mb-10">
-          <h2 className="mb-4 text-sm font-bold uppercase tracking-wider text-slate-400">Related Subcategories</h2>
+          <h2 className="mb-4 text-sm font-bold uppercase tracking-wider text-slate-400">
+            Related Subcategories
+          </h2>
           <div className="flex flex-wrap gap-3">
             {category.children.map((child) => (
               <Link
@@ -133,13 +135,13 @@ export default async function CategoryPage({
           searchParams.condition ||
           searchParams.priceMin ||
           searchParams.priceMax) && (
-            <Link
-              href={`/categories/${params.slug}`}
-              className="text-sm text-primary-600 hover:text-primary-700"
-            >
-              Clear Filters
-            </Link>
-          )}
+          <Link
+            href={`/categories/${params.slug}`}
+            className="text-sm text-primary-600 hover:text-primary-700"
+          >
+            Clear Filters
+          </Link>
+        )}
       </div>
 
       {/* Product Grid */}

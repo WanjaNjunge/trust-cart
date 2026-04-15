@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { BullModule } from '@nestjs/bullmq';
 import { HealthController } from './health.controller';
 import { PrismaModule } from './modules/prisma';
 import { ProductsModule } from './modules/products';
@@ -8,6 +9,10 @@ import { BrandsModule } from './modules/brands';
 import { AuthModule } from './modules/auth';
 import { UsersModule } from './modules/users';
 import { CartModule } from './modules/cart';
+import { OrdersModule } from './modules/orders';
+import { PaymentsModule } from './modules/payments/payments.module';
+import { NotificationsModule } from './modules/notifications';
+import { AdminModule } from './modules/admin/admin.module';
 
 @Module({
   imports: [
@@ -17,8 +22,23 @@ import { CartModule } from './modules/cart';
       envFilePath: ['.env.local', '.env'],
     }),
 
+    // BullMQ for async job processing
+    BullModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
+        connection: {
+          host: configService.get('REDIS_HOST', 'localhost'),
+          port: configService.get('REDIS_PORT', 6379),
+        },
+      }),
+    }),
+
     // Database module
     PrismaModule,
+
+    // Notifications module (async job processing)
+    NotificationsModule,
 
     // Auth module
     AuthModule,
@@ -33,11 +53,12 @@ import { CartModule } from './modules/cart';
     ProductsModule,
     CategoriesModule,
     BrandsModule,
-    // OrdersModule,    // TODO: Phase 8.4
-    // PaymentsModule,  // TODO: Phase 8.5 (high-risk, requires approval)
-    // AdminModule,     // TODO: Phase 8.6
+    OrdersModule,
+    PaymentsModule,
+    AdminModule,
   ],
   controllers: [HealthController],
   providers: [],
 })
-export class AppModule {}
+export class AppModule { }
+

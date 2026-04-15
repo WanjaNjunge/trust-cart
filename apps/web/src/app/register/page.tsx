@@ -68,7 +68,6 @@ export default function RegisterPage() {
       <div className="w-full max-w-[440px]">
         {/* Glass Container */}
         <div className="relative overflow-hidden rounded-2xl border border-stone-200 bg-white/90 p-8 shadow-xl backdrop-blur-xl transition-all duration-500 hover:shadow-stone-200/50">
-
           {/* Subtle Top Accent (Dark Red to Gold) */}
           <div className="absolute top-0 left-0 h-1 w-full bg-gradient-to-r from-red-900 via-amber-600 to-amber-400 opacity-80" />
 
@@ -86,7 +85,10 @@ export default function RegisterPage() {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
-                <label htmlFor="firstName" className="block text-xs font-semibold text-slate-700 ml-1">
+                <label
+                  htmlFor="firstName"
+                  className="block text-xs font-semibold text-slate-700 ml-1"
+                >
                   First Name
                 </label>
                 <input
@@ -100,7 +102,10 @@ export default function RegisterPage() {
                 />
               </div>
               <div className="space-y-1.5">
-                <label htmlFor="lastName" className="block text-xs font-semibold text-slate-700 ml-1">
+                <label
+                  htmlFor="lastName"
+                  className="block text-xs font-semibold text-slate-700 ml-1"
+                >
                   Last Name
                 </label>
                 <input

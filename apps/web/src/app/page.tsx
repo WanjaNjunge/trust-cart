@@ -223,8 +223,9 @@ function HeroSection() {
                 <button
                   key={p.id}
                   onClick={() => setActiveProduct(i)}
-                  className={`h-2 rounded-full transition-all ${i === activeProduct ? 'w-8 bg-blue-600' : 'w-2 bg-slate-300 hover:bg-blue-400'
-                    }`}
+                  className={`h-2 rounded-full transition-all ${
+                    i === activeProduct ? 'w-8 bg-blue-600' : 'w-2 bg-slate-300 hover:bg-blue-400'
+                  }`}
                 />
               ))}
             </div>

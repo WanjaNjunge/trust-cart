@@ -1,6 +1,16 @@
+'use client';
+
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 
 export function Footer() {
+  const pathname = usePathname();
+
+  // Don't render footer on admin pages
+  if (pathname?.startsWith('/admin')) {
+    return null;
+  }
+
   return (
     <footer
       id="global-trustcart-footer"

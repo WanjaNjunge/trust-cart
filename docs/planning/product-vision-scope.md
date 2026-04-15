@@ -102,6 +102,9 @@ The following capabilities are **required** for initial launch. Anything not lis
 > [!NOTE]
 > **Guest Checkout Supported:** All shopping and checkout functionality is available to both anonymous (guest) users and logged-in users. Account creation is encouraged but not required to complete a purchase.
 
+> [!IMPORTANT]
+> **Amendment (2026-02-08):** While guest checkout is fully supported, viewing order history at `/orders` requires authentication. Guest checkout users receive order confirmation via email. Session-based order viewing is deferred to Phase 8.7.
+
 - [ ] Add to cart / remove from cart (available to all users)
 - [ ] Cart persistence:
   - Logged-in users: cart persists across sessions and devices

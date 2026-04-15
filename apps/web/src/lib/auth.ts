@@ -40,3 +40,12 @@ export function setStoredUser(user: import('./types').User): void {
   if (typeof window === 'undefined') return;
   localStorage.setItem(USER_KEY, JSON.stringify(user));
 }
+
+export function hasRole(user: import('./types').User | null, allowedRoles: string[]): boolean {
+  if (!user) return false;
+  return allowedRoles.includes(user.role);
+}
+
+export function isAdminOrStaff(user: import('./types').User | null): boolean {
+  return hasRole(user, ['ADMIN', 'MANAGER', 'STAFF']);
+}

@@ -170,6 +170,13 @@ graph TB
 | **Cart expiration** | Guest carts expire after 7 days of inactivity                                         |
 | **Price snapshot**  | `priceAtAdd` captures price when item added; checkout uses current price from Product |
 
+> [!IMPORTANT]
+> **Amendment (2026-02-08): Guest Order Access**  
+> While guest checkout is fully supported, viewing order history at `/orders` requires user authentication.
+> - Guest users complete checkout normally and receive order confirmation via email
+> - To view order history in the app, guests must create an account
+> - Session-based order viewing is deferred to Phase 8.7
+
 ---
 
 ### 1.5 Order Domain

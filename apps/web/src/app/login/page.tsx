@@ -64,7 +64,6 @@ function LoginForm() {
       <div className="w-full max-w-[440px]">
         {/* Glass Container */}
         <div className="relative overflow-hidden rounded-2xl border border-stone-200 bg-white/90 p-8 shadow-xl backdrop-blur-xl transition-all duration-500 hover:shadow-stone-200/50">
-
           {/* Subtle Top Accent (Dark Red to Gold) */}
           <div className="absolute top-0 left-0 h-1 w-full bg-gradient-to-r from-red-900 via-amber-600 to-amber-400 opacity-80" />
 
@@ -154,7 +153,9 @@ function LoginForm() {
           </div>
 
           <div className="mt-6 rounded-lg bg-slate-50 p-4 text-center">
-            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Demo Credentials</p>
+            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">
+              Demo Credentials
+            </p>
             <div className="flex flex-col gap-1 text-xs text-slate-600 font-mono">
               <span>admin@trustcart.co.ke</span>
               <span>Test123!</span>

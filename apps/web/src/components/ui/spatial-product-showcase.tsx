@@ -87,7 +87,11 @@ const PRODUCT_DATA: Record<ProductId, ProductData> = {
 // 2. ANIMATION VARIANTS
 // =========================================
 
-const ANIMATIONS = {
+const ANIMATIONS: {
+  container: Variants;
+  item: Variants;
+  image: (isLeft: boolean) => Variants;
+} = {
   container: {
     hidden: { opacity: 0 },
     visible: {
@@ -349,9 +353,8 @@ export default function EarbudShowcase() {
         <motion.div
           layout
           transition={{ type: 'spring', bounce: 0, duration: 0.9 }}
-          className={`flex flex-col md:flex-row items-center justify-center gap-12 md:gap-32 lg:gap-48 w-full ${
-            isLeft ? 'md:flex-row' : 'md:flex-row-reverse'
-          }`}
+          className={`flex flex-col md:flex-row items-center justify-center gap-12 md:gap-32 lg:gap-48 w-full ${isLeft ? 'md:flex-row' : 'md:flex-row-reverse'
+            }`}
         >
           {/* Left Column: Visuals */}
           <ProductVisual data={currentData} isLeft={isLeft} />

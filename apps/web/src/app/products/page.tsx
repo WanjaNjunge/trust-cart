@@ -41,8 +41,8 @@ export default async function ProductsPage({
       priceMin: searchParams.priceMin ? Number(searchParams.priceMin) : undefined,
       priceMax: searchParams.priceMax ? Number(searchParams.priceMax) : undefined,
       sort: searchParams.sort,
-    }).catch(err => {
-      console.error("Failed to fetch products:", err);
+    }).catch((err) => {
+      console.error('Failed to fetch products:', err);
       // Return fallback structure matching ProductListResponse
       return {
         data: [],
@@ -50,8 +50,8 @@ export default async function ProductsPage({
           totalItems: 0,
           totalPages: 1,
           currentPage: 1,
-          limit: 12
-        }
+          limit: 12,
+        },
       };
     }),
     getCategories().catch(() => ({ data: [] })),

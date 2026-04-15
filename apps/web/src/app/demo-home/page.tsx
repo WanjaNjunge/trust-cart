@@ -121,7 +121,7 @@ const scaleIn = {
   visible: {
     opacity: 1,
     scale: 1,
-    transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1] },
+    transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1] as const },
   },
 };
 
@@ -136,6 +136,9 @@ function HeroSection() {
   }, []);
 
   const product = FEATURED_PRODUCTS[activeProduct];
+
+  // Guard against undefined product (shouldn't happen, but TypeScript needs assurance)
+  if (!product) return null;
 
   return (
     <section className="relative flex min-h-screen items-center justify-center overflow-hidden bg-black pt-20">
@@ -313,9 +316,8 @@ function HeroSection() {
                 <button
                   key={p.id}
                   onClick={() => setActiveProduct(i)}
-                  className={`h-2 rounded-full transition-all ${
-                    i === activeProduct ? 'w-8 bg-white' : 'w-2 bg-white/30 hover:bg-white/50'
-                  }`}
+                  className={`h-2 rounded-full transition-all ${i === activeProduct ? 'w-8 bg-white' : 'w-2 bg-white/30 hover:bg-white/50'
+                    }`}
                 />
               ))}
             </div>

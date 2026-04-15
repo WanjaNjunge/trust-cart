@@ -60,6 +60,11 @@ export function Header() {
 
   if (!mounted) return null;
 
+  // Don't render global header on admin pages (they have their own layout)
+  if (pathname?.startsWith('/admin')) {
+    return null;
+  }
+
   return (
     <motion.header
       initial={{ y: -100 }}
@@ -70,7 +75,7 @@ export function Header() {
         'fixed left-0 right-0 top-0 z-50 transition-all duration-300 transform-gpu',
         scrolled
           ? 'bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-sm'
-          : 'bg-white/80 backdrop-blur-sm border-b border-transparent'
+          : 'bg-white/80 backdrop-blur-sm border-b border-transparent',
       )}
     >
       <div className="mx-auto flex h-20 max-w-7xl items-center justify-between gap-8 px-4 sm:px-6 lg:px-8">
@@ -102,19 +107,35 @@ export function Header() {
 
           {/* Account */}
           {user ? (
-            <div className="hidden flex-col items-center gap-1 md:flex">
+            <div className="hidden items-center gap-4 md:flex">
+              {(user.role === 'ADMIN' || user.role === 'MANAGER') && (
+                <Link
+                  href="/admin"
+                  className="text-xs font-semibold uppercase tracking-wider text-slate-600 hover:text-blue-600"
+                >
+                  Admin
+                </Link>
+              )}
               <Link
-                href="/account"
-                className="text-xs font-semibold uppercase tracking-wider text-slate-900 hover:text-blue-600"
+                href="/orders"
+                className="text-xs font-semibold uppercase tracking-wider text-slate-600 hover:text-blue-600"
               >
-                {user.firstName}
+                Orders
               </Link>
-              <button
-                onClick={handleLogout}
-                className="text-[10px] uppercase tracking-wider text-slate-500 hover:text-red-500"
-              >
-                Logout
-              </button>
+              <div className="flex flex-col items-center gap-1">
+                <Link
+                  href="/account"
+                  className="text-xs font-semibold uppercase tracking-wider text-slate-900 hover:text-blue-600"
+                >
+                  {user.firstName}
+                </Link>
+                <button
+                  onClick={handleLogout}
+                  className="text-[10px] uppercase tracking-wider text-slate-500 hover:text-red-500"
+                >
+                  Logout
+                </button>
+              </div>
             </div>
           ) : (
             <Link
@@ -212,6 +233,13 @@ export function Header() {
               {user ? (
                 <>
                   <Link
+                    href="/orders"
+                    className="text-base font-medium text-slate-600 hover:text-blue-600"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    My Orders
+                  </Link>
+                  <Link
                     href="/account"
                     className="text-base font-medium text-slate-600 hover:text-blue-600"
                     onClick={() => setIsMenuOpen(false)}
@@ -244,4 +272,3 @@ export function Header() {
     </motion.header>
   );
 }
-

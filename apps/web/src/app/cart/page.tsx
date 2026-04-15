@@ -143,7 +143,10 @@ export default function CartPage() {
           </svg>
           <h2 className="mt-4 text-xl font-bold text-slate-900">Your cart is empty</h2>
           <p className="mt-2 text-slate-500">Start shopping to add items to your cart</p>
-          <Link href="/products" className="mt-8 inline-flex items-center justify-center rounded-full bg-slate-900 px-8 py-3 text-base font-bold text-white shadow-lg transition-transform hover:scale-105">
+          <Link
+            href="/products"
+            className="mt-8 inline-flex items-center justify-center rounded-full bg-slate-900 px-8 py-3 text-base font-bold text-white shadow-lg transition-transform hover:scale-105"
+          >
             Browse Products
           </Link>
         </div>
@@ -185,9 +188,7 @@ export default function CartPage() {
                         >
                           {item.product.name}
                         </Link>
-                        <p className="font-bold text-slate-900">
-                          {formatPrice(item.lineTotal)}
-                        </p>
+                        <p className="font-bold text-slate-900">{formatPrice(item.lineTotal)}</p>
                       </div>
                       <p className="mt-1 text-sm text-slate-500">
                         {formatPrice(item.priceAtAdd)} each
@@ -205,7 +206,9 @@ export default function CartPage() {
                           >
                             −
                           </button>
-                          <span className="w-8 text-center font-medium text-slate-900">{item.quantity}</span>
+                          <span className="w-8 text-center font-medium text-slate-900">
+                            {item.quantity}
+                          </span>
                           <button
                             onClick={() => handleUpdateQuantity(item.id, item.quantity + 1)}
                             className="flex h-7 w-7 items-center justify-center rounded-md text-slate-500 hover:bg-slate-100"
@@ -284,7 +287,10 @@ export default function CartPage() {
                         onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
                         className="flex-1 rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm focus:border-amber-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-amber-500/20"
                       />
-                      <button type="submit" className="rounded-xl bg-slate-100 px-4 py-2.5 text-sm font-medium text-slate-900 hover:bg-slate-200">
+                      <button
+                        type="submit"
+                        className="rounded-xl bg-slate-100 px-4 py-2.5 text-sm font-medium text-slate-900 hover:bg-slate-200"
+                      >
                         Apply
                       </button>
                     </div>
@@ -295,12 +301,12 @@ export default function CartPage() {
               </div>
 
               {/* Checkout Button - Gold Gradient */}
-              <button
-                disabled
-                className="mt-8 w-full overflow-hidden rounded-xl bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 py-4 font-bold text-slate-900 shadow-xl shadow-amber-500/20 opacity-50 cursor-not-allowed"
+              <Link
+                href="/checkout"
+                className="mt-8 block w-full overflow-hidden rounded-xl bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 py-4 font-bold text-slate-900 shadow-xl shadow-amber-500/20 text-center transition-transform hover:scale-[1.02] hover:shadow-2xl"
               >
-                Proceed to Checkout (Coming Soon)
-              </button>
+                Proceed to Checkout
+              </Link>
 
               <Link
                 href="/products"

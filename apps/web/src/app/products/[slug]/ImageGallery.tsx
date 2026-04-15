@@ -18,14 +18,14 @@ export function ImageGallery({ images, productName }: ImageGalleryProps) {
     images.length > 0
       ? images
       : [
-          {
-            id: 'placeholder',
-            url: getPlaceholderImage(600, 600),
-            altText: productName,
-            sortOrder: 0,
-            isPrimary: true,
-          },
-        ];
+        {
+          id: 'placeholder',
+          url: getPlaceholderImage(600, 600),
+          altText: productName,
+          sortOrder: 0,
+          isPrimary: true,
+        },
+      ];
 
   // Safely get selected image with fallback
   const selectedImage = displayImages[selectedIndex] ?? displayImages[0];
@@ -42,7 +42,7 @@ export function ImageGallery({ images, productName }: ImageGalleryProps) {
   return (
     <div className="space-y-4">
       {/* Main Image */}
-      <div className="relative aspect-square overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+      <div className="relative aspect-[4/3] overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
         <Image
           src={selectedImage.url}
           alt={selectedImage.altText || productName}
@@ -61,11 +61,10 @@ export function ImageGallery({ images, productName }: ImageGalleryProps) {
             <button
               key={image.id}
               onClick={() => setSelectedIndex(index)}
-              className={`relative aspect-square overflow-hidden rounded-xl bg-white border ${
-                index === selectedIndex
+              className={`relative aspect-square overflow-hidden rounded-xl bg-white border ${index === selectedIndex
                   ? 'border-amber-500 ring-2 ring-amber-200 ring-offset-2'
                   : 'border-slate-200 hover:border-amber-300'
-              }`}
+                }`}
             >
               <Image
                 src={image.url}

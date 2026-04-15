@@ -17,9 +17,7 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product }: ProductCardProps) {
-  const [imgSrc, setImgSrc] = useState(
-    product.primaryImage?.url || getPlaceholderImage(400, 500)
-  );
+  const [imgSrc, setImgSrc] = useState(product.primaryImage?.url || getPlaceholderImage(400, 500));
 
   const discountPercent = product.compareAtPrice
     ? getDiscountPercentage(product.price, product.compareAtPrice)
@@ -69,9 +67,7 @@ export function ProductCard({ product }: ProductCardProps) {
           </div>
 
           <div className="flex items-baseline gap-2">
-            <span className="text-lg font-bold text-slate-900">
-              {formatPrice(product.price)}
-            </span>
+            <span className="text-lg font-bold text-slate-900">{formatPrice(product.price)}</span>
             {product.compareAtPrice && (
               <span className="text-sm text-slate-400 line-through">
                 {formatPrice(product.compareAtPrice)}
@@ -90,4 +86,3 @@ export function ProductCard({ product }: ProductCardProps) {
     </Link>
   );
 }
-

@@ -2,11 +2,7 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { Breadcrumbs } from '@/components';
 import { getProductBySlug } from '@/lib/api';
-import {
-  formatPrice,
-  getConditionLabel,
-  getDiscountPercentage,
-} from '@/lib/utils';
+import { formatPrice, getConditionLabel, getDiscountPercentage } from '@/lib/utils';
 import { ImageGallery } from './ImageGallery';
 import { ProductActions } from './AddToCartButton';
 import { Check, Shield, Truck, RotateCcw } from 'lucide-react';
@@ -16,6 +12,8 @@ interface ProductPageProps {
     slug: string;
   };
 }
+
+export const dynamic = 'force-dynamic';
 
 export async function generateMetadata({ params }: ProductPageProps): Promise<Metadata> {
   try {
@@ -62,27 +60,29 @@ export default async function ProductPage({ params }: ProductPageProps) {
   breadcrumbItems.push({ label: product.name });
 
   // Generate Key Features (mock if none exist)
-  const keyFeatures = product.attributes.slice(0, 4);
+  const keyFeatures = (product.attributes || []).slice(0, 4);
 
   return (
-
     <div className="mx-auto max-w-7xl px-4 pt-28 pb-16 sm:px-6 lg:px-8">
       <Breadcrumbs items={breadcrumbItems} />
 
       {/* Main Grid: Gallery & Buying Options */}
       <div className="mt-8 grid gap-12 lg:grid-cols-12">
         {/* Image Gallery (Left - 7 cols) */}
-        <div className="lg:col-span-8">
+        <div className="lg:col-span-6">
           <ImageGallery images={product.images || []} productName={product.name} />
         </div>
 
-        {/* Product Actions (Right - 4 cols) */}
-        <div className="lg:col-span-4 flex flex-col gap-6">
-
+        {/* Product Actions (Right - 6 cols) */}
+        <div className="lg:col-span-6 flex flex-col gap-6">
           {/* Header Section */}
           <div>
             <div className="mb-2 flex items-center gap-2 text-sm font-medium text-slate-500">
-              {product.brand && <span className="uppercase tracking-wider text-slate-700">{product.brand.name}</span>}
+              {product.brand && (
+                <span className="uppercase tracking-wider text-slate-700">
+                  {product.brand.name}
+                </span>
+              )}
               {product.brand && product.category && <span className="text-slate-300">•</span>}
               {product.category && <span className="text-blue-600">{product.category.name}</span>}
             </div>
@@ -139,7 +139,9 @@ export default async function ProductPage({ params }: ProductPageProps) {
                 {keyFeatures.map((attr, i) => (
                   <li key={i} className="flex items-start gap-2 text-sm text-slate-600">
                     <div className="mt-1 h-1.5 w-1.5 rounded-full bg-slate-400 shrink-0" />
-                    <span><span className="font-medium text-slate-800">{attr.name}:</span> {attr.value}</span>
+                    <span>
+                      <span className="font-medium text-slate-800">{attr.name}:</span> {attr.value}
+                    </span>
                   </li>
                 ))}
               </ul>
@@ -165,7 +167,9 @@ export default async function ProductPage({ params }: ProductPageProps) {
                 <Shield className="h-5 w-5" />
               </div>
               <div>
-                <p className="text-xs font-bold text-slate-900">{product.warrantyMonths} Month Warranty</p>
+                <p className="text-xs font-bold text-slate-900">
+                  {product.warrantyMonths} Month Warranty
+                </p>
                 <p className="text-[10px] text-slate-500">Official Coverage</p>
               </div>
             </div>
@@ -203,7 +207,6 @@ export default async function ProductPage({ params }: ProductPageProps) {
       {/* Detailed Info Section (Full Width) */}
       <div className="mt-16 sm:mt-24">
         <div className="grid gap-12 lg:grid-cols-12">
-
           {/* Description */}
           <div className="lg:col-span-7">
             <h2 className="text-2xl font-bold text-slate-900 mb-6">Product Description</h2>
@@ -211,7 +214,11 @@ export default async function ProductPage({ params }: ProductPageProps) {
               <p>{product.description}</p>
               {/* Placeholder for future rich text */}
               <br />
-              <p>Experience the power and elegance of the {product.name}. Designed for professionals and creatives alike, this device delivers exceptional performance in a sleek, portable form factor.</p>
+              <p>
+                Experience the power and elegance of the {product.name}. Designed for professionals
+                and creatives alike, this device delivers exceptional performance in a sleek,
+                portable form factor.
+              </p>
             </div>
           </div>
 
@@ -235,7 +242,6 @@ export default async function ProductPage({ params }: ProductPageProps) {
           </div>
         </div>
       </div>
-
     </div>
   );
 }

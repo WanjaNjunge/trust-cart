@@ -302,10 +302,11 @@ export default function AccountPage() {
                 {addresses.map((address) => (
                   <div
                     key={address.id}
-                    className={`group relative rounded-xl border p-5 transition-all hover:shadow-md ${address.isDefault
-                      ? 'border-blue-200 bg-blue-50/30'
-                      : 'border-slate-200 bg-white hover:border-slate-300'
-                      }`}
+                    className={`group relative rounded-xl border p-5 transition-all hover:shadow-md ${
+                      address.isDefault
+                        ? 'border-blue-200 bg-blue-50/30'
+                        : 'border-slate-200 bg-white hover:border-slate-300'
+                    }`}
                   >
                     <div className="mb-3 flex items-start justify-between">
                       <div className="flex items-center gap-2">
@@ -430,4 +431,3 @@ export default function AccountPage() {
     </div>
   );
 }
-

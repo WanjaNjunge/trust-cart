@@ -60,6 +60,31 @@ export interface ProductListResponse {
   pagination: Pagination;
 }
 
+export interface CreateProductRequest {
+  name: string;
+  description: string;
+  shortDescription?: string;
+  price: number;
+  compareAtPrice?: number;
+  condition: ProductCondition;
+  categoryId: string;
+  brandId?: string;
+  quantityOnHand?: number;
+  images?: Array<{
+    url: string;
+    altText?: string;
+    isPrimary?: boolean;
+  }>;
+  attributes?: Array<{
+    name: string;
+    value: string;
+  }>;
+  isActive?: boolean;
+  isFeatured?: boolean;
+}
+
+export type UpdateProductRequest = Partial<CreateProductRequest>;
+
 // Category Types
 export interface Category {
   id: string;
@@ -231,4 +256,93 @@ export interface Cart {
 export interface AddToCartRequest {
   productId: string;
   quantity: number;
+}
+
+// ===========================================
+// Order Types
+// ===========================================
+
+export type OrderStatus =
+  | 'PENDING_PAYMENT'
+  | 'PAYMENT_FAILED'
+  | 'CONFIRMED'
+  | 'PROCESSING'
+  | 'READY_FOR_PICKUP'
+  | 'DISPATCHED'
+  | 'IN_TRANSIT'
+  | 'OUT_FOR_DELIVERY'
+  | 'DELIVERED'
+  | 'CANCELLED'
+  | 'REFUNDED';
+
+export type PaymentMethod = 'MPESA_STK' | 'MPESA_PAYBILL' | 'CARD' | 'POD_CASH';
+
+export interface OrderItem {
+  id: string;
+  productId: string;
+  productName: string;
+  productSku: string;
+  quantity: number;
+  unitPrice: number;
+  lineTotal: number;
+}
+
+export interface OrderAddress {
+  recipientName: string;
+  phone: string;
+  line1: string;
+  line2?: string;
+  city: string;
+  county: string;
+}
+
+export interface OrderStatusHistory {
+  fromStatus?: string;
+  toStatus: string;
+  changedByType: string;
+  reason?: string;
+  createdAt: string;
+}
+
+export interface Order {
+  id: string;
+  orderNumber: string;
+  status: OrderStatus;
+  items: OrderItem[];
+  address: OrderAddress | null;
+  subtotal: number;
+  deliveryFee: number;
+  discount: number;
+  total: number;
+  paymentMethod: PaymentMethod;
+  notes?: string;
+  promoCode?: string;
+  statusHistory: OrderStatusHistory[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CheckoutRequest {
+  addressId: string;
+  paymentMethod: PaymentMethod;
+  notes?: string;
+}
+
+export interface CheckoutResponse {
+  id: string;
+  orderNumber: string;
+  status: string;
+  total: number;
+  paymentMethod: string;
+  message: string;
+}
+
+export interface OrderListResponse {
+  data: Order[];
+  meta: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
 }

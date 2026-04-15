@@ -34,12 +34,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps): Pro
         <div className="flex min-h-[500px] flex-col items-center justify-center rounded-3xl border border-slate-200 bg-white/50 backdrop-blur-sm">
           <div className="text-center max-w-md px-6">
             <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-blue-50 text-blue-500 mb-6">
-              <svg
-                className="h-10 w-10"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
+              <svg className="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -49,9 +44,14 @@ export default async function SearchPage({ searchParams }: SearchPageProps): Pro
               </svg>
             </div>
             <h1 className="text-2xl font-bold text-slate-900">Search TrustCart</h1>
-            <p className="mt-3 text-slate-500">Enter a keyword, brand, or product name to explore our premium collection.</p>
+            <p className="mt-3 text-slate-500">
+              Enter a keyword, brand, or product name to explore our premium collection.
+            </p>
             <div className="mt-8">
-              <Link href="/products" className="inline-flex items-center justify-center rounded-full bg-slate-900 px-8 py-3 text-sm font-bold text-white transition-transform hover:scale-105 hover:bg-slate-800">
+              <Link
+                href="/products"
+                className="inline-flex items-center justify-center rounded-full bg-slate-900 px-8 py-3 text-sm font-bold text-white transition-transform hover:scale-105 hover:bg-slate-800"
+              >
                 Browse All Products
               </Link>
             </div>
@@ -70,7 +70,8 @@ export default async function SearchPage({ searchParams }: SearchPageProps): Pro
       <div className="mb-8 border-b border-slate-100 pb-6">
         <h1 className="text-3xl font-extrabold text-slate-900">Search Results</h1>
         <p className="mt-2 text-slate-500 font-medium">
-          Found <span className="text-blue-600">{pagination.totalItems}</span> matching products for "<span className="text-slate-900">{query}</span>"
+          Found <span className="text-blue-600">{pagination.totalItems}</span> matching products for
+          "<span className="text-slate-900">{query}</span>"
         </p>
       </div>
 
@@ -93,12 +94,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps): Pro
         <div className="flex min-h-[400px] flex-col items-center justify-center rounded-3xl border border-dashed border-slate-300 bg-slate-50/50">
           <div className="text-center max-w-md px-6">
             <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-slate-200 text-slate-500 mb-4">
-              <svg
-                className="h-8 w-8"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
+              <svg className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -109,13 +105,20 @@ export default async function SearchPage({ searchParams }: SearchPageProps): Pro
             </div>
             <h2 className="text-xl font-bold text-slate-900">No matches found</h2>
             <p className="mt-2 text-slate-500">
-              We couldn't find any products matching "{query}". Try checking for typos or using broader keywords.
+              We couldn't find any products matching "{query}". Try checking for typos or using
+              broader keywords.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
-              <Link href="/products" className="rounded-full bg-slate-900 px-6 py-2.5 text-sm font-bold text-white hover:bg-slate-800 transition-colors">
+              <Link
+                href="/products"
+                className="rounded-full bg-slate-900 px-6 py-2.5 text-sm font-bold text-white hover:bg-slate-800 transition-colors"
+              >
                 Browse Catalog
               </Link>
-              <Link href="/" className="rounded-full border border-slate-300 bg-white px-6 py-2.5 text-sm font-bold text-slate-700 hover:bg-slate-50 transition-colors">
+              <Link
+                href="/"
+                className="rounded-full border border-slate-300 bg-white px-6 py-2.5 text-sm font-bold text-slate-700 hover:bg-slate-50 transition-colors"
+              >
                 Return Home
               </Link>
             </div>

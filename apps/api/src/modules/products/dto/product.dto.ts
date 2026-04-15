@@ -150,6 +150,21 @@ export class ProductListQueryDto {
   @IsOptional()
   @IsBoolean()
   isFeatured?: boolean;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsBoolean()
+  includeInactive?: boolean;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsBoolean()
+  inStock?: boolean;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsBoolean()
+  isActive?: boolean;
 }
 
 export class PaginationDto {

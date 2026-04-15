@@ -125,7 +125,7 @@ export async function searchProducts(query: string, limit = 20): Promise<Product
 
 import { getToken } from './auth';
 
-async function authenticatedFetchApi<T>(endpoint: string, options?: RequestInit): Promise<T> {
+export async function authenticatedFetchApi<T>(endpoint: string, options?: RequestInit): Promise<T> {
   const token = getToken();
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
@@ -147,8 +147,15 @@ async function authenticatedFetchApi<T>(endpoint: string, options?: RequestInit)
     throw new ApiError(response.status, errorData.message || 'An error occurred', errorData.error);
   }
 
+  // Handle 204 No Content
+  if (response.status === 204) {
+    return {} as T;
+  }
+
   return response.json();
 }
+
+export const authenticatedRequest = authenticatedFetchApi;
 
 export async function register(data: RegisterRequest): Promise<User> {
   return fetchApi<User>('/auth/register', {
@@ -301,6 +308,48 @@ export async function removeCartPromoCode(): Promise<Cart> {
   });
 }
 
+// ===========================================
+// Checkout & Orders API
+// ===========================================
+
+import type {
+  CheckoutRequest,
+  CheckoutResponse,
+  Order,
+  OrderItem,
+  OrderListResponse,
+} from './types';
+
+export async function checkout(data: CheckoutRequest): Promise<CheckoutResponse> {
+  return cartFetchApi<CheckoutResponse>('/checkout', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  });
+}
+
+
+export async function initiatePayment(orderId: string, phoneNumber?: string): Promise<{ status: string; message: string; transactionId: string }> {
+  return cartFetchApi<{ status: string; message: string; transactionId: string }>('/payments/initiate', {
+    method: 'POST',
+    body: JSON.stringify({ orderId, phoneNumber }),
+  });
+}
+
+export async function getOrders(page = 1, limit = 10): Promise<OrderListResponse> {
+  return authenticatedFetchApi<OrderListResponse>(`/orders?page=${page}&limit=${limit}`);
+}
+
+export async function getOrderById(id: string): Promise<Order> {
+  return authenticatedFetchApi<Order>(`/orders/${id}`);
+}
+
+export async function cancelOrder(id: string, reason?: string): Promise<Order> {
+  return authenticatedFetchApi<Order>(`/orders/${id}/cancel`, {
+    method: 'POST',
+    body: JSON.stringify({ reason }),
+  });
+}
+
 // Re-export types for convenience
 export type {
   Product,
@@ -312,4 +361,9 @@ export type {
   Address,
   Cart,
   CartItem,
+  Order,
+  OrderItem,
+  CheckoutRequest,
+  CheckoutResponse,
+  OrderListResponse,
 };

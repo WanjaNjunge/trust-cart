@@ -964,6 +964,76 @@ Similar to Order Tracking but with:
 
 ---
 
+### 5.4a Orders Login Prompt (Amendment 2026-02-08)
+
+| Attribute        | Details                                                  |
+| ---------------- | -------------------------------------------------------- |
+| **Route**        | `/orders` (unauthenticated), `/orders/{orderId}` (unauthenticated) |
+| **Purpose**      | Prompt unauthenticated users to login to view orders     |
+| **Target Users** | Guests or logged-out users attempting to access orders   |
+
+> [!IMPORTANT]
+> **Amendment:** Added in Phase 8.6 to handle auth-only order viewing. Session-based guest order access deferred to Phase 8.7.
+
+#### Layout
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                        HEADER                           │
+├─────────────────────────────────────────────────────────┤
+│  YOUR ORDERS                                            │
+│  Track and manage your orders                           │
+├─────────────────────────────────────────────────────────┤
+│                                                         │
+│              ┌─────────────────────────┐                │
+│              │         👤              │                │
+│              │    (User icon)          │                │
+│              └─────────────────────────┘                │
+│                                                         │
+│         Sign in to view your orders                     │
+│                                                         │
+│  Track your orders, view order history, and manage      │
+│  deliveries by signing in to your account.              │
+│                                                         │
+│         [ Sign In ]  [ Create Account ]                 │
+│                                                         │
+│  ─────────────────────────────────────────────          │
+│                                                         │
+│  Checked out as a guest?                                │
+│  Your order confirmation was sent to your email.        │
+│                                                         │
+├─────────────────────────────────────────────────────────┤
+│                        FOOTER                           │
+└─────────────────────────────────────────────────────────┘
+```
+
+#### Key Components
+
+| Component         | Description                            | Data Required |
+| ----------------- | -------------------------------------- | ------------- |
+| User Icon         | Visual indicator for login state       | —             |
+| Heading           | "Sign in to view your orders"          | Static        |
+| Subtext           | Explanation of benefits                | Static        |
+| Sign In Button    | Primary CTA, links to `/login`         | —             |
+| Create Account    | Secondary CTA, links to `/register`    | —             |
+| Guest Note        | "Order confirmation sent to email"     | Static        |
+
+#### Primary Actions
+
+| Action         | Behavior                                    |
+| -------------- | ------------------------------------------- |
+| Sign In        | Navigate to `/login?redirect=/orders`       |
+| Create Account | Navigate to `/register?redirect=/orders`    |
+
+#### UX Considerations
+
+- ✅ Clear messaging explaining why login is required
+- ✅ Preserve redirect URL so user returns to orders after login
+- ✅ Guest checkout users reminded their confirmation was emailed
+- ✅ No error styling - this is an expected state, not an error
+
+---
+
 ### 5.5 Return Request Form
 
 | Attribute   | Details                            |

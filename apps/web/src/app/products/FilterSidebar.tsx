@@ -61,10 +61,11 @@ export function FilterSidebar({ categories, brands, currentFilters }: FilterSide
         <div className="space-y-2">
           <button
             onClick={() => updateFilter('categoryId', undefined)}
-            className={`block w-full rounded-lg px-3 py-2 text-left text-sm transition-colors ${!currentFilters.categoryId
+            className={`block w-full rounded-lg px-3 py-2 text-left text-sm transition-colors ${
+              !currentFilters.categoryId
                 ? 'bg-blue-100 font-bold text-blue-700'
                 : 'text-slate-600 hover:bg-slate-50'
-              }`}
+            }`}
           >
             All Categories
           </button>
@@ -72,10 +73,11 @@ export function FilterSidebar({ categories, brands, currentFilters }: FilterSide
             <button
               key={category.id}
               onClick={() => updateFilter('categoryId', category.id)}
-              className={`block w-full rounded-lg px-3 py-2 text-left text-sm transition-colors ${currentFilters.categoryId === category.id
+              className={`block w-full rounded-lg px-3 py-2 text-left text-sm transition-colors ${
+                currentFilters.categoryId === category.id
                   ? 'bg-blue-100 font-bold text-blue-700'
                   : 'text-slate-600 hover:bg-slate-50'
-                }`}
+              }`}
             >
               {category.name}
               <span className="ml-1 text-slate-400">({category.productCount})</span>
@@ -90,10 +92,11 @@ export function FilterSidebar({ categories, brands, currentFilters }: FilterSide
         <div className="space-y-2">
           <button
             onClick={() => updateFilter('brandId', undefined)}
-            className={`block w-full rounded-lg px-3 py-2 text-left text-sm transition-colors ${!currentFilters.brandId
+            className={`block w-full rounded-lg px-3 py-2 text-left text-sm transition-colors ${
+              !currentFilters.brandId
                 ? 'bg-blue-100 font-bold text-blue-700'
                 : 'text-slate-600 hover:bg-slate-50'
-              }`}
+            }`}
           >
             All Brands
           </button>
@@ -101,10 +104,11 @@ export function FilterSidebar({ categories, brands, currentFilters }: FilterSide
             <button
               key={brand.id}
               onClick={() => updateFilter('brandId', brand.id)}
-              className={`block w-full rounded-lg px-3 py-2 text-left text-sm transition-colors ${currentFilters.brandId === brand.id
+              className={`block w-full rounded-lg px-3 py-2 text-left text-sm transition-colors ${
+                currentFilters.brandId === brand.id
                   ? 'bg-blue-100 font-bold text-blue-700'
                   : 'text-slate-600 hover:bg-slate-50'
-                }`}
+              }`}
             >
               {brand.name}
               <span className="ml-1 text-slate-400">({brand.productCount})</span>
@@ -119,10 +123,11 @@ export function FilterSidebar({ categories, brands, currentFilters }: FilterSide
         <div className="space-y-2">
           <button
             onClick={() => updateFilter('condition', undefined)}
-            className={`block w-full rounded-lg px-3 py-2 text-left text-sm transition-colors ${!currentFilters.condition
+            className={`block w-full rounded-lg px-3 py-2 text-left text-sm transition-colors ${
+              !currentFilters.condition
                 ? 'bg-blue-100 font-bold text-blue-700'
                 : 'text-slate-600 hover:bg-slate-50'
-              }`}
+            }`}
           >
             Any Condition
           </button>
@@ -130,10 +135,11 @@ export function FilterSidebar({ categories, brands, currentFilters }: FilterSide
             <button
               key={condition}
               onClick={() => updateFilter('condition', condition)}
-              className={`block w-full rounded-lg px-3 py-2 text-left text-sm transition-colors ${currentFilters.condition === condition
+              className={`block w-full rounded-lg px-3 py-2 text-left text-sm transition-colors ${
+                currentFilters.condition === condition
                   ? 'bg-blue-100 font-bold text-blue-700'
                   : 'text-slate-600 hover:bg-slate-50'
-                }`}
+              }`}
             >
               {getConditionLabel(condition)}
             </button>
