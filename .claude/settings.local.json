@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(xargs grep *)",
+      "Bash(grep -i env find c:/Users/STEPH/Documents/Portfolio/Projects/modern-ecom -maxdepth 2 -name \"*.env*\" -o -name \".env*\")"
+    ]
+  }
+}
