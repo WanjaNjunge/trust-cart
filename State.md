@@ -1,8 +1,8 @@
 # TrustCart Kenya — Project State
 
-**Last updated:** 2026-04-27
-**Current phase:** 8.7 (Admin Operations) — In Progress (~30%)
-**Next milestone:** Close Phase 8.7 → begin Phase 8.8 (Integration & QA)
+**Last updated:** 2026-04-29
+**Current phase:** 8.8 (Integration & QA) — Ready to begin
+**Last completed:** 8.7 ✅ + Phase 8.8 Part A technical debt ✅
 
 ---
 
@@ -16,165 +16,47 @@
 | 8.4 | Checkout Flow | ✅ Functional | 8/9 | Order confirmation inline in checkout, not a separate route |
 | 8.5 | Payment (Stub) | ⚠️ Partial | 4/10 | Core stub flow works; significant spec gaps — see Section 3 |
 | 8.6 | Order Management | ✅ Complete | 8/8 | — |
-| 8.7 | Admin Operations | 🔧 In Progress | 3/11 | **Active phase** |
-| 8.8 | Integration & QA | ⏳ Not Started | 0/9 | Blocked by 8.7 |
+| 8.7 | Admin Operations | ✅ Complete | 11/11 | All backend + frontend implemented 2026-04-28 |
+| 8.8 | Integration & QA | ⏳ Not Started | 0/9 | Ready to begin |
 
 ---
 
-## Section 2: Current Sprint — Phase 8.7 Remaining Work
+## Section 2: Phase 8.7 — Completed Work (2026-04-28)
 
-### Item 1 — Admin Inventory Controller + Adjustment Endpoint
-**Step:** 8.7.3 (inventory adjust) + 8.7.11 (low-stock from real data)
-**Risk:** 🔴 High — inventory writes require audit trail
+All 5 remaining items implemented and verified:
 
-**Backend files to create:**
-- `apps/api/src/modules/admin/admin.inventory.controller.ts`
-  - `PATCH /admin/inventory/:productId/adjust`
-  - Guards: `@Roles(ADMIN, MANAGER, STAFF)`
-- `apps/api/src/modules/admin/admin.inventory.service.ts` (or add to `admin.service.ts`)
-  - `adjustInventory(productId, dto)` — Prisma `$transaction`:
-    1. Update `InventoryRecord.quantityOnHand += dto.quantity`
-    2. Create `StockAdjustment` record (reference, reason, adjustedBy)
-- DTO: `AdjustInventoryDto` — fields: `quantity: number`, `adjustmentType: string`, `reference: string`, `reason?: string`
+| Item | Files Created | Status |
+|------|--------------|--------|
+| Admin Inventory Backend | `admin-inventory.controller.ts`, `admin-inventory.service.ts`, `dto/adjust-inventory.dto.ts` | ✅ Done |
+| Admin Orders Backend | `admin-orders.controller.ts`, `admin-orders.service.ts`, `dto/update-order-status.dto.ts`, `dto/initiate-refund.dto.ts` | ✅ Done |
+| Real Dashboard Stats | `admin.service.ts` — replaced hardcoded stub with Prisma queries + raw SQL for low-stock | ✅ Done |
+| Admin Inventory Frontend | `apps/web/src/app/(admin)/admin/inventory/page.tsx` | ✅ Done |
+| Admin Orders Frontend | `apps/web/src/app/(admin)/admin/orders/page.tsx` | ✅ Done |
 
-**Files to modify:**
-- `apps/api/src/modules/admin/admin.module.ts` — add new controller + service to providers/controllers
-
-**Dependencies:** None — InventoryRecord and StockAdjustment models already exist in schema
+**Note:** `StockAdjustmentType` enum in schema uses `PURCHASE, SALE, RETURN, DAMAGE, CORRECTION` (not RECEIVED/RECOUNT as originally specced). Frontend and DTO match the schema values.
 
 ---
 
-### Item 2 — Admin Orders Controller (Status Update + Refund)
-**Step:** 8.7.4 (order status) + 8.7.5 (refund)
-**Risk:** 🔴 High — requires approval for any refund logic changes
+## Section 3: Technical Debt Status
 
-**Backend files to create:**
-- `apps/api/src/modules/admin/admin.orders.controller.ts`
-  - `GET /admin/orders` — paginated, filterable by status (Staff+)
-  - `PATCH /admin/orders/:id/status` — valid transitions only (Staff+)
-  - `POST /admin/orders/:id/refund` — creates Refund record (Manager+)
-- `apps/api/src/modules/admin/admin.orders.service.ts`
-  - `findAll(query)` — paginated orders for admin view
-  - `updateStatus(orderId, dto, actingUser)`:
-    1. Validate transition against order lifecycle
-    2. Update `Order.status`
-    3. Create `OrderStatusHistory` entry (reason required)
-    4. Enqueue `order.status_changed` to `notifications` queue
-  - `initiateRefund(orderId, dto, actingUser)`:
-    1. Check Manager+ role
-    2. Create `Refund` record (status: PENDING)
-    3. Log to audit trail
-
-**DTOs to create:**
-- `UpdateOrderStatusDto` — `status: OrderStatus`, `reason: string`
-- `InitiateRefundDto` — `amount: number`, `reason: string`
-
-**Files to modify:**
-- `apps/api/src/modules/admin/admin.module.ts` — import `OrdersModule` or `PrismaModule` and add new controller/service
-
-**Dependencies:** Relies on `OrdersModule` or direct `PrismaService` access
+| Priority | Phase | Item | Status | Notes |
+|----------|-------|------|--------|-------|
+| ~~Should-fix~~ | 8.5 | `GET /payments/:id` | ✅ Resolved 2026-04-29 | `payments.controller.ts` + `payments.service.ts` |
+| ~~Should-fix~~ | 8.5 | Payment status polling | ✅ Resolved 2026-04-29 | `checkout/page.tsx` — polls every 3 s, max 12 attempts, redirects on CONFIRMED |
+| ~~Should-fix~~ | 8.5 | Idempotency check | ✅ Resolved 2026-04-29 | Checks for existing non-failed transaction before creating new one |
+| ~~Should-fix~~ | 8.2 | Forgot/Reset password pages | ✅ Resolved 2026-04-29 | `forgot-password/page.tsx` + `reset-password/page.tsx` |
+| ~~Nice-to-have~~ | 8.4 | Separate confirmation page | ✅ Resolved 2026-04-29 | `/order-confirmation/[id]/page.tsx` — checkout redirects here |
+| Nice-to-have | 8.5 | BullMQ for payment.verify | ⏳ Deferred to 8.8 | Stub `setTimeout` still in use — acceptable for MVP |
+| Nice-to-have | 8.5 | Webhook endpoint | ⏳ Deferred to 8.8 | `POST /webhooks/mpesa/callback` not implemented |
 
 ---
 
-### Item 3 — Fix AdminService Dashboard Stats
-**Step:** 8.7.6 (real dashboard data)
-**Risk:** 🟢 Low — read-only Prisma queries
+## Section 4: Phase 8.8 Preparation Checklist
 
-**File to modify:**
-- `apps/api/src/modules/admin/admin.service.ts`
-  - Uncomment `PrismaService` constructor injection
-  - Replace hardcoded stub with real Prisma queries:
-    - `orders.total` — `prisma.order.count()`
-    - `orders.pending` — `prisma.order.count({ where: { status: 'PENDING_PAYMENT' } })`
-    - `revenue.total` — `prisma.order.aggregate({ _sum: { totalAmount: true } })`
-    - `products.lowStock` — `prisma.inventoryRecord.count({ where: { quantityOnHand: { lte: prisma raw ref reorderThreshold } } })`
-    - `customers.total` — `prisma.user.count({ where: { role: 'CUSTOMER' } })`
-- `apps/api/src/modules/admin/admin.module.ts` — ensure `PrismaModule` is in imports (already is)
-
----
-
-### Item 4 — Admin Inventory Frontend Page
-**Step:** 8.7.8
-**Risk:** 🟢 Low
-
-**Files to create:**
-- `apps/web/src/app/(admin)/admin/inventory/page.tsx`
-  - Product list with current `quantityOnHand`, `reorderThreshold`
-  - Low-stock rows highlighted (when `quantityOnHand <= reorderThreshold`)
-  - Adjust stock modal/form — calls `PATCH /admin/inventory/:productId/adjust`
-  - Requires `'use client'` for modal state
-
-**API function to add in `apps/web/src/lib/api.ts`:**
-- `adjustInventory(productId, dto)` — `PATCH /admin/inventory/:productId/adjust`
-- `getAdminInventory(query)` — fetches products with inventory data
-
----
-
-### Item 5 — Admin Orders Frontend Page
-**Step:** 8.7.9
-**Risk:** 🟢 Low
-
-**Files to create:**
-- `apps/web/src/app/(admin)/admin/orders/page.tsx`
-  - Orders table: order number, customer, status, total, date
-  - Status filter dropdown (all, pending, confirmed, dispatched, etc.)
-  - Pagination
-  - Status update dropdown per row (valid transitions only)
-  - Refund button — only for Manager+ role, requires confirmation dialog
-  - Calls `PATCH /admin/orders/:id/status` and `POST /admin/orders/:id/refund`
-
-**API functions to add in `apps/web/src/lib/api.ts`:**
-- `getAdminOrders(query)` — `GET /admin/orders`
-- `updateOrderStatus(orderId, dto)` — `PATCH /admin/orders/:id/status`
-- `initiateRefund(orderId, dto)` — `POST /admin/orders/:id/refund`
-
----
-
-## Section 3: Technical Debt (Pre-8.8 Fixes)
-
-| Priority | Phase | Item | Description |
-|----------|-------|------|-------------|
-| Should-fix | 8.5 | `GET /payments/:id` | No endpoint for payment status lookup — required for frontend polling |
-| Should-fix | 8.5 | Payment status polling | Frontend doesn't poll after MPesa initiation — user sees immediate success |
-| Should-fix | 8.5 | Idempotency check | Key stored on `PaymentTransaction` but never validated on re-submit — duplicates not rejected |
-| Should-fix | 8.2 | Forgot/Reset password pages | `/forgot-password` and `/reset-password` routes 404 — backend logic works, frontend missing |
-| Nice-to-have | 8.4 | Separate confirmation page | `checkout/page.tsx` inline success — no dedicated `/order-confirmation/[id]` route |
-| Nice-to-have | 8.5 | BullMQ for payment.verify | Stub currently uses raw `setTimeout` — not reliable across restarts |
-| Nice-to-have | 8.5 | Webhook endpoint | `POST /webhooks/mpesa/callback` not implemented |
-
----
-
-## Section 4: Suggested Execution Order for Remaining 8.7 Work
-
-```
-Step 1: Backend — admin.inventory.controller.ts + service
-  → PATCH /admin/inventory/:productId/adjust
-  → AdjustInventoryDto (quantity, adjustmentType, reference, reason)
-  → Prisma $transaction: update InventoryRecord + create StockAdjustment
-  → Wire into admin.module.ts
-
-Step 2: Backend — admin.orders.controller.ts + service
-  → GET /admin/orders (paginated, status filter)
-  → PATCH /admin/orders/:id/status (Staff+, valid transitions, reason required)
-  → POST /admin/orders/:id/refund (Manager+, creates Refund record)
-  → Emit order.status_changed to notifications queue on every transition
-  → Wire into admin.module.ts
-
-Step 3: Backend — Fix AdminService.getDashboardStats()
-  → Uncomment PrismaService
-  → Real queries: today's orders count, total revenue, low-stock count,
-    total customers, total products
-
-Step 4: Frontend — /admin/inventory/page.tsx
-  → Product list with stock levels
-  → Low-stock row highlighting (quantityOnHand <= reorderThreshold)
-  → Adjust stock modal → POST to PATCH /admin/inventory/:id/adjust
-
-Step 5: Frontend — /admin/orders/page.tsx
-  → Orders table with status filter + pagination
-  → Status update per row (valid transitions only)
-  → Refund button (Manager+ only, confirmation dialog required)
-```
+All 8.7 work is done. Before starting 8.8:
+- [ ] Resolve should-fix technical debt from Section 3 (especially `GET /payments/:id` and payment polling)
+- [ ] Confirm docker services running: `pnpm docker:up`
+- [ ] Run `pnpm db:seed` to have test data for QA
 
 ---
 

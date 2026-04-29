@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import {
   MapPin,
   Phone,
@@ -22,6 +23,7 @@ import {
   getAddresses,
   checkout,
   initiatePayment,
+  getPaymentStatus,
   type Cart,
   type Address,
   type CheckoutRequest,
@@ -57,6 +59,16 @@ const KENYA_COUNTIES = [
 ];
 
 export default function CheckoutPage() {
+  const router = useRouter();
+  const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // Cleanup poll interval on unmount
+  useEffect(() => {
+    return () => {
+      if (pollRef.current) clearInterval(pollRef.current);
+    };
+  }, []);
+
   const [cart, setCart] = useState<Cart | null>(null);
   const [addresses, setAddresses] = useState<Address[]>([]);
   const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null);
@@ -221,13 +233,46 @@ export default function CheckoutPage() {
         const payResult = await initiatePayment(result.id, phoneToUse);
         setPaymentResult(payResult);
         setOrderResult(result);
+
+        if (payResult.status === 'CONFIRMED') {
+          // POD or already-confirmed — go straight to confirmation page
+          router.push(`/order-confirmation/${result.id}`);
+        } else if (payResult.status === 'INITIATED' && payResult.transactionId) {
+          // MPesa stub: poll every 3 seconds, up to 12 attempts (36 seconds — outlasts 5 s stub)
+          const txId = payResult.transactionId;
+          const orderId = result.id;
+          let attempts = 0;
+          const maxAttempts = 12;
+
+          pollRef.current = setInterval(async () => {
+            attempts += 1;
+            try {
+              const tx = await getPaymentStatus(txId);
+              if (tx.status === 'CONFIRMED') {
+                clearInterval(pollRef.current!);
+                router.push(`/order-confirmation/${orderId}`);
+              } else if (tx.status === 'FAILED' || tx.status === 'CANCELLED') {
+                clearInterval(pollRef.current!);
+                setError('Payment failed. Please try again from Order History.');
+                setSubmitting(false);
+              } else if (attempts >= maxAttempts) {
+                clearInterval(pollRef.current!);
+                // Timeout — send to confirmation page anyway; order exists
+                router.push(`/order-confirmation/${orderId}`);
+              }
+            } catch {
+              // Network error during poll — keep trying until max attempts
+              if (attempts >= maxAttempts) {
+                clearInterval(pollRef.current!);
+                router.push(`/order-confirmation/${orderId}`);
+              }
+            }
+          }, 3000);
+        }
       } catch (payErr) {
-        // Order created but payment init failed
-        // For MVP, we'll just show the order success but warn about payment?
-        // Or show the error.
         setError('Order created but payment initiation failed. Please try again from Order History.');
         console.error(payErr);
-        setOrderResult(result); // Show success anyway so they don't lose the order
+        setOrderResult(result);
       }
 
     } catch (err) {
