@@ -1,4 +1,5 @@
 import { PrismaClient, UserRole, ProductCondition, DiscountType } from '@prisma/client';
+import * as bcrypt from 'bcrypt';
 
 const prisma = new PrismaClient();
 
@@ -8,6 +9,10 @@ async function main() {
   // ImageKit base URL for product and category images
   const IMAGEKIT_BASE = 'https://ik.imagekit.io/nr5uqiflj/trustcart';
 
+  // Hash at runtime so we always get a valid hash — never rely on hardcoded strings
+  const TEST_PASSWORD = 'Test123!';
+  const passwordHash = await bcrypt.hash(TEST_PASSWORD, 10);
+
   // ===========================================
   // 1. USERS
   // ===========================================
@@ -15,10 +20,10 @@ async function main() {
 
   await prisma.user.upsert({
     where: { email: 'admin@trustcart.co.ke' },
-    update: {},
+    update: { passwordHash }, // Keep password in sync on every seed run
     create: {
       email: 'admin@trustcart.co.ke',
-      passwordHash: '$2b$10$vI8aWBnW3fID.ZQ4/zo1G.q1lRps.9cGLcZEiGDMVr5yUP1KUOYTa', // Test123!
+      passwordHash,
       firstName: 'Admin',
       lastName: 'User',
       phone: '254700000001',
@@ -30,10 +35,10 @@ async function main() {
 
   await prisma.user.upsert({
     where: { email: 'manager@trustcart.co.ke' },
-    update: {},
+    update: { passwordHash },
     create: {
       email: 'manager@trustcart.co.ke',
-      passwordHash: '$2b$10$vI8aWBnW3fID.ZQ4/zo1G.q1lRps.9cGLcZEiGDMVr5yUP1KUOYTa',
+      passwordHash,
       firstName: 'Manager',
       lastName: 'User',
       phone: '254700000002',
@@ -45,10 +50,10 @@ async function main() {
 
   await prisma.user.upsert({
     where: { email: 'staff@trustcart.co.ke' },
-    update: {},
+    update: { passwordHash },
     create: {
       email: 'staff@trustcart.co.ke',
-      passwordHash: '$2b$10$vI8aWBnW3fID.ZQ4/zo1G.q1lRps.9cGLcZEiGDMVr5yUP1KUOYTa',
+      passwordHash,
       firstName: 'Staff',
       lastName: 'User',
       phone: '254700000003',
@@ -60,10 +65,10 @@ async function main() {
 
   const customer1 = await prisma.user.upsert({
     where: { email: 'john.doe@example.com' },
-    update: {},
+    update: { passwordHash },
     create: {
       email: 'john.doe@example.com',
-      passwordHash: '$2b$10$vI8aWBnW3fID.ZQ4/zo1G.q1lRps.9cGLcZEiGDMVr5yUP1KUOYTa',
+      passwordHash,
       firstName: 'John',
       lastName: 'Doe',
       phone: '254712345678',
@@ -75,10 +80,10 @@ async function main() {
 
   const customer2 = await prisma.user.upsert({
     where: { email: 'jane.wanjiku@example.com' },
-    update: {},
+    update: { passwordHash },
     create: {
       email: 'jane.wanjiku@example.com',
-      passwordHash: '$2b$10$vI8aWBnW3fID.ZQ4/zo1G.q1lRps.9cGLcZEiGDMVr5yUP1KUOYTa',
+      passwordHash,
       firstName: 'Jane',
       lastName: 'Wanjiku',
       phone: '254798765432',
@@ -435,10 +440,10 @@ async function main() {
   for (const product of allProducts) {
     await prisma.inventoryRecord.upsert({
       where: { productId: product.id },
-      update: {},
+      update: { quantityOnHand: 20, quantityReserved: 0 }, // reset stock on every seed run
       create: {
         productId: product.id,
-        quantityOnHand: Math.floor(Math.random() * 20) + 5,
+        quantityOnHand: 20,
         quantityReserved: 0,
         reorderThreshold: 5,
       },
