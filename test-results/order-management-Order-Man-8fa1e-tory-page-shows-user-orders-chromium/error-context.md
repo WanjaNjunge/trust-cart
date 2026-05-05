@@ -56,139 +56,139 @@ Call log:
         - heading "Your Orders" [level=1] [ref=e29]
         - paragraph [ref=e30]: Track and manage your orders
       - generic [ref=e31]:
-        - link "TC-2026-000021 Pending Payment 4 May 2026 • 1 item Ksh 65,990 MPESA STK HP EliteBook 840 G6 × 1" [ref=e32] [cursor=pointer]:
-          - /url: /orders/cmoqtgp07001mnc9mgmr3wmj4
+        - link "TC-2026-000035 Pending Payment 4 May 2026 • 1 item Ksh 65,990 MPESA STK HP EliteBook 840 G6 × 1" [ref=e32] [cursor=pointer]:
+          - /url: /orders/cmor4uf3x001j1md8uru164rp
           - generic [ref=e33]:
             - generic [ref=e34]:
               - generic [ref=e35]:
                 - generic [ref=e36]:
-                  - heading "TC-2026-000021" [level=3] [ref=e37]
+                  - heading "TC-2026-000035" [level=3] [ref=e37]
                   - generic [ref=e38]: Pending Payment
                 - paragraph [ref=e39]: 4 May 2026 • 1 item
               - generic [ref=e40]:
                 - paragraph [ref=e41]: Ksh 65,990
                 - paragraph [ref=e42]: MPESA STK
             - generic [ref=e45]: HP EliteBook 840 G6 × 1
-        - link "TC-2026-000020 Confirmed 4 May 2026 • 1 item Ksh 65,990 MPESA STK HP EliteBook 840 G6 × 1" [ref=e46] [cursor=pointer]:
-          - /url: /orders/cmoqtf6wy000jnc9mmmkr2wfq
+        - link "TC-2026-000034 Confirmed 4 May 2026 • 1 item Ksh 65,990 MPESA STK HP EliteBook 840 G6 × 1" [ref=e46] [cursor=pointer]:
+          - /url: /orders/cmor4rup5000h1md808revafu
           - generic [ref=e47]:
             - generic [ref=e48]:
               - generic [ref=e49]:
                 - generic [ref=e50]:
-                  - heading "TC-2026-000020" [level=3] [ref=e51]
+                  - heading "TC-2026-000034" [level=3] [ref=e51]
                   - generic [ref=e52]: Confirmed
                 - paragraph [ref=e53]: 4 May 2026 • 1 item
               - generic [ref=e54]:
                 - paragraph [ref=e55]: Ksh 65,990
                 - paragraph [ref=e56]: MPESA STK
             - generic [ref=e59]: HP EliteBook 840 G6 × 1
-        - link "TC-2026-000019 Confirmed 2 May 2026 • 1 item Ksh 65,990 MPESA STK HP EliteBook 840 G6 × 1" [ref=e60] [cursor=pointer]:
-          - /url: /orders/cmood9xe7009f14nvdy0a5fx2
+        - link "TC-2026-000033 Confirmed 4 May 2026 • 1 item Ksh 65,990 MPESA STK HP EliteBook 840 G6 × 1" [ref=e60] [cursor=pointer]:
+          - /url: /orders/cmor44oxu008enc9mfn1nhq3o
           - generic [ref=e61]:
             - generic [ref=e62]:
               - generic [ref=e63]:
                 - generic [ref=e64]:
-                  - heading "TC-2026-000019" [level=3] [ref=e65]
+                  - heading "TC-2026-000033" [level=3] [ref=e65]
                   - generic [ref=e66]: Confirmed
-                - paragraph [ref=e67]: 2 May 2026 • 1 item
+                - paragraph [ref=e67]: 4 May 2026 • 1 item
               - generic [ref=e68]:
                 - paragraph [ref=e69]: Ksh 65,990
                 - paragraph [ref=e70]: MPESA STK
             - generic [ref=e73]: HP EliteBook 840 G6 × 1
-        - link "TC-2026-000018 Pending Payment 2 May 2026 • 1 item Ksh 55,990 MPESA STK Lenovo ThinkPad T480 × 1" [ref=e74] [cursor=pointer]:
-          - /url: /orders/cmood8zf8008h14nvbkltil85
+        - link "TC-2026-000032 Pending Payment 4 May 2026 • 1 item Ksh 55,990 MPESA STK Lenovo ThinkPad T480 × 1" [ref=e74] [cursor=pointer]:
+          - /url: /orders/cmor438vp007knc9mly8obbvu
           - generic [ref=e75]:
             - generic [ref=e76]:
               - generic [ref=e77]:
                 - generic [ref=e78]:
-                  - heading "TC-2026-000018" [level=3] [ref=e79]
+                  - heading "TC-2026-000032" [level=3] [ref=e79]
                   - generic [ref=e80]: Pending Payment
-                - paragraph [ref=e81]: 2 May 2026 • 1 item
+                - paragraph [ref=e81]: 4 May 2026 • 1 item
               - generic [ref=e82]:
                 - paragraph [ref=e83]: Ksh 55,990
                 - paragraph [ref=e84]: MPESA STK
             - generic [ref=e87]: Lenovo ThinkPad T480 × 1
-        - link "TC-2026-000017 Pending Payment 2 May 2026 • 1 item Ksh 65,990 MPESA STK HP EliteBook 840 G6 × 1" [ref=e88] [cursor=pointer]:
-          - /url: /orders/cmood8xxl008314nvm2mj6pv6
+        - link "TC-2026-000031 Pending Payment 4 May 2026 • 1 item Ksh 65,990 MPESA STK HP EliteBook 840 G6 × 1" [ref=e88] [cursor=pointer]:
+          - /url: /orders/cmor432k50077nc9mrf54yzin
           - generic [ref=e89]:
             - generic [ref=e90]:
               - generic [ref=e91]:
                 - generic [ref=e92]:
-                  - heading "TC-2026-000017" [level=3] [ref=e93]
+                  - heading "TC-2026-000031" [level=3] [ref=e93]
                   - generic [ref=e94]: Pending Payment
-                - paragraph [ref=e95]: 2 May 2026 • 1 item
+                - paragraph [ref=e95]: 4 May 2026 • 1 item
               - generic [ref=e96]:
                 - paragraph [ref=e97]: Ksh 65,990
                 - paragraph [ref=e98]: MPESA STK
             - generic [ref=e101]: HP EliteBook 840 G6 × 1
-        - link "TC-2026-000016 Pending Payment 2 May 2026 • 1 item Ksh 65,990 MPESA STK HP EliteBook 840 G6 × 1" [ref=e102] [cursor=pointer]:
-          - /url: /orders/cmood8m3e007p14nvthv9o0l3
+        - link "TC-2026-000030 Pending Payment 4 May 2026 • 1 item Ksh 65,990 MPESA STK HP EliteBook 840 G6 × 1" [ref=e102] [cursor=pointer]:
+          - /url: /orders/cmor42juc006snc9mvjmiosow
           - generic [ref=e103]:
             - generic [ref=e104]:
               - generic [ref=e105]:
                 - generic [ref=e106]:
-                  - heading "TC-2026-000016" [level=3] [ref=e107]
+                  - heading "TC-2026-000030" [level=3] [ref=e107]
                   - generic [ref=e108]: Pending Payment
-                - paragraph [ref=e109]: 2 May 2026 • 1 item
+                - paragraph [ref=e109]: 4 May 2026 • 1 item
               - generic [ref=e110]:
                 - paragraph [ref=e111]: Ksh 65,990
                 - paragraph [ref=e112]: MPESA STK
             - generic [ref=e115]: HP EliteBook 840 G6 × 1
-        - link "TC-2026-000015 Pending Payment 2 May 2026 • 1 item Ksh 65,990 MPESA STK HP EliteBook 840 G6 × 1" [ref=e116] [cursor=pointer]:
-          - /url: /orders/cmood8bqw007a14nv8n7imqhm
+        - link "TC-2026-000029 Pending Payment 4 May 2026 • 1 item Ksh 65,990 MPESA STK HP EliteBook 840 G6 × 1" [ref=e116] [cursor=pointer]:
+          - /url: /orders/cmor423c5006enc9mflxei1mk
           - generic [ref=e117]:
             - generic [ref=e118]:
               - generic [ref=e119]:
                 - generic [ref=e120]:
-                  - heading "TC-2026-000015" [level=3] [ref=e121]
+                  - heading "TC-2026-000029" [level=3] [ref=e121]
                   - generic [ref=e122]: Pending Payment
-                - paragraph [ref=e123]: 2 May 2026 • 1 item
+                - paragraph [ref=e123]: 4 May 2026 • 1 item
               - generic [ref=e124]:
                 - paragraph [ref=e125]: Ksh 65,990
                 - paragraph [ref=e126]: MPESA STK
             - generic [ref=e129]: HP EliteBook 840 G6 × 1
-        - link "TC-2026-000014 Pending Payment 2 May 2026 • 1 item Ksh 65,990 MPESA STK HP EliteBook 840 G6 × 1" [ref=e130] [cursor=pointer]:
-          - /url: /orders/cmood7yo9006w14nvwsuheu5h
+        - link "TC-2026-000028 Pending Payment 4 May 2026 • 1 item Ksh 65,990 MPESA STK HP EliteBook 840 G6 × 1" [ref=e130] [cursor=pointer]:
+          - /url: /orders/cmor41taq0061nc9m2y8sp9ip
           - generic [ref=e131]:
             - generic [ref=e132]:
               - generic [ref=e133]:
                 - generic [ref=e134]:
-                  - heading "TC-2026-000014" [level=3] [ref=e135]
+                  - heading "TC-2026-000028" [level=3] [ref=e135]
                   - generic [ref=e136]: Pending Payment
-                - paragraph [ref=e137]: 2 May 2026 • 1 item
+                - paragraph [ref=e137]: 4 May 2026 • 1 item
               - generic [ref=e138]:
                 - paragraph [ref=e139]: Ksh 65,990
                 - paragraph [ref=e140]: MPESA STK
             - generic [ref=e143]: HP EliteBook 840 G6 × 1
-        - link "TC-2026-000013 Pending Payment 2 May 2026 • 1 item Ksh 65,990 MPESA STK HP EliteBook 840 G6 × 1" [ref=e144] [cursor=pointer]:
-          - /url: /orders/cmood7sb9006i14nvdeqme9uy
+        - link "TC-2026-000027 Confirmed 4 May 2026 • 1 item Ksh 65,990 MPESA STK HP EliteBook 840 G6 × 1" [ref=e144] [cursor=pointer]:
+          - /url: /orders/cmor3zi3s0051nc9mqfiyygj6
           - generic [ref=e145]:
             - generic [ref=e146]:
               - generic [ref=e147]:
                 - generic [ref=e148]:
-                  - heading "TC-2026-000013" [level=3] [ref=e149]
-                  - generic [ref=e150]: Pending Payment
-                - paragraph [ref=e151]: 2 May 2026 • 1 item
+                  - heading "TC-2026-000027" [level=3] [ref=e149]
+                  - generic [ref=e150]: Confirmed
+                - paragraph [ref=e151]: 4 May 2026 • 1 item
               - generic [ref=e152]:
                 - paragraph [ref=e153]: Ksh 65,990
                 - paragraph [ref=e154]: MPESA STK
             - generic [ref=e157]: HP EliteBook 840 G6 × 1
-        - link "TC-2026-000012 Confirmed 2 May 2026 • 1 item Ksh 65,990 MPESA STK HP EliteBook 840 G6 × 1" [ref=e158] [cursor=pointer]:
-          - /url: /orders/cmood65q7005h14nv1nppvbr3
+        - link "TC-2026-000026 Confirmed 4 May 2026 • 1 item Ksh 65,990 MPESA STK HP EliteBook 840 G6 × 1" [ref=e158] [cursor=pointer]:
+          - /url: /orders/cmoqtieid0046nc9mm6ufkmng
           - generic [ref=e159]:
             - generic [ref=e160]:
               - generic [ref=e161]:
                 - generic [ref=e162]:
-                  - heading "TC-2026-000012" [level=3] [ref=e163]
+                  - heading "TC-2026-000026" [level=3] [ref=e163]
                   - generic [ref=e164]: Confirmed
-                - paragraph [ref=e165]: 2 May 2026 • 1 item
+                - paragraph [ref=e165]: 4 May 2026 • 1 item
               - generic [ref=e166]:
                 - paragraph [ref=e167]: Ksh 65,990
                 - paragraph [ref=e168]: MPESA STK
             - generic [ref=e171]: HP EliteBook 840 G6 × 1
         - generic [ref=e172]:
           - button "Previous" [disabled] [ref=e173]
-          - generic [ref=e174]: Page 1 of 2
+          - generic [ref=e174]: Page 1 of 4
           - button "Next" [ref=e175] [cursor=pointer]
   - contentinfo [ref=e176]:
     - generic [ref=e177]:

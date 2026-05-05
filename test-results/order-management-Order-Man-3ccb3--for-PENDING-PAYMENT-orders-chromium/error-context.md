@@ -14,14 +14,14 @@
 ```
 Error: expect(locator).toBeVisible() failed
 
-Locator: getByText('TC-2026-000023')
+Locator: getByText('TC-2026-000037')
 Expected: visible
 Timeout: 10000ms
 Error: element(s) not found
 
 Call log:
   - Expect "toBeVisible" with timeout 10000ms
-  - waiting for getByText('TC-2026-000023')
+  - waiting for getByText('TC-2026-000037')
 
 ```
 
