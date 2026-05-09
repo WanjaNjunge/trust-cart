@@ -11,10 +11,19 @@ export default defineConfig({
     headless: true,
     screenshot: 'only-on-failure',
     video: 'off',
+    trace: 'on-first-retry',
   },
   projects: [
     {
+      // Full regression suite — no grep filter, runs all 56 tests
       name: 'chromium',
+      use: { browserName: 'chromium' },
+    },
+    {
+      // Smoke suite — only @smoke-tagged tests; used in CI on every PR
+      // Run locally: pnpm e2e:smoke
+      name: 'smoke',
+      grep: /@smoke/,
       use: { browserName: 'chromium' },
     },
   ],

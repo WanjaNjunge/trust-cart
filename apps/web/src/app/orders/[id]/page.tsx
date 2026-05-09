@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, use } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { getOrderById, cancelOrder, type Order } from '@/lib/api';
 import { formatPrice } from '@/lib/utils';
@@ -155,8 +155,7 @@ function CancelOrderModal({
     );
 }
 
-export default function OrderDetailPage({ params }: { params: Promise<{ id: string }> }) {
-    const resolvedParams = use(params);
+export default function OrderDetailPage({ params }: { params: { id: string } }) {
     const [order, setOrder] = useState<Order | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -177,7 +176,7 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
         async function loadOrder() {
             try {
                 setLoading(true);
-                const data = await getOrderById(resolvedParams.id);
+                const data = await getOrderById(params.id);
                 setOrder(data);
             } catch (err) {
                 console.error('Failed to load order:', err);
@@ -188,7 +187,7 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
         }
 
         loadOrder();
-    }, [resolvedParams.id]);
+    }, [params.id]);
 
     const handleCancelOrder = async (reason: string) => {
         if (!order) return;
@@ -223,7 +222,7 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
             <LoginPrompt
                 title="Order Details"
                 subtitle="View your order information"
-                redirectPath={`/orders/${resolvedParams.id}`}
+                redirectPath={`/orders/${params.id}`}
             />
         );
     }

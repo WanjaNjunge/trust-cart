@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, use } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { CheckCircle, ShoppingBag, MapPin, Smartphone, Truck } from 'lucide-react';
@@ -17,8 +17,8 @@ const STATUS_LABEL: Record<string, string> = {
   CANCELLED: 'Cancelled',
 };
 
-export default function OrderConfirmationPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = use(params);
+export default function OrderConfirmationPage({ params }: { params: { id: string } }) {
+  const { id } = params;
   const router = useRouter();
 
   const [order, setOrder] = useState<Order | null>(null);

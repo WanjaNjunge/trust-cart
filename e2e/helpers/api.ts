@@ -93,6 +93,15 @@ export async function clearCart(token: string): Promise<void> {
   }
 }
 
+export async function addToCartApi(
+  token: string,
+  productSlug: string,
+): Promise<{ id: string }> {
+  const product = await apiRequest<{ id: string }>('GET', `/products/slug/${productSlug}`);
+  await apiRequest('POST', '/cart/items', { productId: product.id, quantity: 1 }, token);
+  return product;
+}
+
 export async function verifyServerReachable(url: string, label: string): Promise<void> {
   try {
     const res = await fetch(url, { signal: AbortSignal.timeout(15000) });

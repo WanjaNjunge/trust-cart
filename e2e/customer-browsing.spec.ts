@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 import { SLUGS } from './fixtures/users';
 
 test.describe('Customer Browsing', () => {
-  test('home page loads with product cards', async ({ page }) => {
+  test('home page loads with product cards', { tag: ['@smoke', '@regression'] }, async ({ page }) => {
     await page.goto('/');
     await expect(page).toHaveTitle(/TrustCart/i);
     // Header is present
@@ -12,7 +12,7 @@ test.describe('Customer Browsing', () => {
     await expect(productCards.first()).toBeVisible({ timeout: 10_000 });
   });
 
-  test('category page shows filtered products', async ({ page }) => {
+  test('category page shows filtered products', { tag: ['@regression'] }, async ({ page }) => {
     await page.goto(`/categories/${SLUGS.category}`);
     // Heading contains category name
     await expect(page.locator('h1')).toContainText(/laptop/i, { timeout: 10_000 });
@@ -21,7 +21,7 @@ test.describe('Customer Browsing', () => {
     await expect(products.first()).toBeVisible({ timeout: 10_000 });
   });
 
-  test('product detail page shows images, price and add-to-cart', async ({ page }) => {
+  test('product detail page shows images, price and add-to-cart', { tag: ['@smoke', '@regression'] }, async ({ page }) => {
     await page.goto(`/products/${SLUGS.product}`);
     // Product name is in the heading
     await expect(page.locator('h1')).toBeVisible({ timeout: 10_000 });
@@ -31,14 +31,14 @@ test.describe('Customer Browsing', () => {
     await expect(page.getByRole('button', { name: /add to cart/i })).toBeVisible();
   });
 
-  test('search results page returns matching products', async ({ page }) => {
+  test('search results page returns matching products', { tag: ['@regression'] }, async ({ page }) => {
     await page.goto('/search?q=laptop');
     // At least one result
     const results = page.locator('a[href^="/products/"]');
     await expect(results.first()).toBeVisible({ timeout: 10_000 });
   });
 
-  test('search for gibberish shows empty state', async ({ page }) => {
+  test('search for gibberish shows empty state', { tag: ['@regression'] }, async ({ page }) => {
     await page.goto('/search?q=xyznonexistentproduct999');
     // Empty state message — page still renders without error
     await expect(page.locator('body')).not.toContainText('500');
@@ -48,7 +48,7 @@ test.describe('Customer Browsing', () => {
     await expect(noResults).toBeVisible({ timeout: 10_000 });
   });
 
-  test('clicking a product card navigates to its detail page', async ({ page }) => {
+  test('clicking a product card navigates to its detail page', { tag: ['@regression'] }, async ({ page }) => {
     await page.goto('/categories/laptops');
     const firstCard = page.locator('a[href^="/products/"]').first();
     await firstCard.waitFor({ timeout: 10_000 });

@@ -61,7 +61,9 @@ test.describe('Admin Dashboard', () => {
 
   test('dashboard stats are real numbers, not the old hardcoded stub', async ({ page }) => {
     await page.goto('/admin');
-    await page.waitForTimeout(1000); // Let stats load
+    // Wait for stats section to fully render before asserting on body text
+    await expect(page.getByText(/total revenue/i)).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByText(/total customers/i)).toBeVisible();
     // Old stub was: Revenue=1,250,000, Orders=45, Customers=850
     // Real DB has ≥2 customers from seed
     const body = await page.locator('body').innerText();
@@ -89,11 +91,9 @@ test.describe('Admin Products', () => {
   test('search filters the product list', async ({ page }) => {
     await page.goto('/admin/products');
     await page.locator('input[placeholder*="search" i]').fill('HP');
-    await page.waitForTimeout(600); // Debounce
     const rows = page.locator('tbody tr');
-    await expect(rows.first()).toBeVisible({ timeout: 8_000 });
-    const text = await rows.first().innerText();
-    expect(text.toLowerCase()).toContain('hp');
+    // toContainText polls until the debounced filter fires and the first row content changes
+    await expect(rows.first()).toContainText(/hp/i, { timeout: 8_000 });
   });
 
   test('navigating to new product page shows create form', async ({ page }) => {
@@ -143,7 +143,6 @@ test.describe('Admin Inventory', () => {
   test('search filters the inventory list', async ({ page }) => {
     await page.goto('/admin/inventory');
     await page.locator('input[placeholder*="search" i]').fill('HP');
-    await page.waitForTimeout(500);
     const rows = page.locator('tbody tr');
     await expect(rows.first()).toBeVisible({ timeout: 8_000 });
   });
@@ -228,7 +227,8 @@ test.describe('Admin Orders', () => {
     const auth = await loginViaApi(USERS.staff.email, USERS.staff.password);
     await setAuthInBrowser(page, auth);
     await page.goto('/admin/orders');
-    await page.waitForTimeout(1000);
+    // Wait for the page to finish loading before asserting the button is absent
+    await expect(page.getByRole('heading', { name: /orders/i })).toBeVisible({ timeout: 10_000 });
     const refundBtn = page.getByRole('button', { name: /refund/i }).first();
     await expect(refundBtn).not.toBeVisible({ timeout: 5_000 });
   });

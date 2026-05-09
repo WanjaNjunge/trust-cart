@@ -35,15 +35,22 @@ test.describe('Order Management (Customer)', () => {
 
   test('order history page shows user orders', async ({ page }) => {
     await page.goto('/orders');
-    await expect(page.getByText(/your orders/i)).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByRole('heading', { name: /your orders/i })).toBeVisible({ timeout: 10_000 });
     await expect(page.getByText(confirmedOrderNumber)).toBeVisible({ timeout: 10_000 });
   });
 
   test('order detail page shows items, address, and status timeline', async ({ page }) => {
     await page.goto(`/orders/${confirmedOrderId}`);
     await expect(page.getByText(confirmedOrderNumber)).toBeVisible({ timeout: 10_000 });
-    await expect(page.getByText(/HP EliteBook|item/i)).toBeVisible();
-    await expect(page.getByText(/Pending Payment|PENDING_PAYMENT/i)).toBeVisible();
+
+    // Scope to the "Order Items" section to avoid matching other headings
+    const itemsSection = page.locator('h2', { hasText: /order items/i }).locator('..');
+    await expect(itemsSection.getByText(/HP EliteBook/i)).toBeVisible();
+
+    // Scope to the "Order Timeline" section — "Pending Payment" also appears in the status badge
+    // Scoping prevents false-positive matches from unrelated parts of the page
+    const timelineSection = page.locator('h2', { hasText: /order timeline/i }).locator('..');
+    await expect(timelineSection.getByText(/Pending Payment/i)).toBeVisible();
   });
 
   test('unauthenticated access to orders shows login prompt', async ({ page }) => {
@@ -94,6 +101,6 @@ test.describe('Order Management (Customer)', () => {
     await expect(confirmBtn).toBeVisible({ timeout: 5_000 });
     await confirmBtn.click();
 
-    await expect(page.getByText(/cancelled/i)).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByText(/cancelled/i).first()).toBeVisible({ timeout: 10_000 });
   });
 });

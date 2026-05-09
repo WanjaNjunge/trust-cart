@@ -4,6 +4,7 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export enum PaymentMethodDto {
   MPESA_STK = 'MPESA_STK',
+  POD_CASH = 'POD_CASH',
 }
 
 export class GuestAddressDto {

@@ -224,6 +224,7 @@ export class OrdersService {
       // 7. Map payment method
       const paymentMethodMap: Record<PaymentMethodDto, PaymentMethod> = {
         [PaymentMethodDto.MPESA_STK]: PaymentMethod.MPESA_STK,
+        [PaymentMethodDto.POD_CASH]: PaymentMethod.POD_CASH,
       };
 
       // 8. Create order

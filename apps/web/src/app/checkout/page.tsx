@@ -209,10 +209,13 @@ export default function CheckoutPage() {
 
       // For guest or new address, include address data
       if (showAddressForm) {
-        // Destructure to separate email from the rest of the address properties
         const { email, ...addressData } = addressForm;
-        request.guestEmail = email;
         request.guestAddress = addressData;
+        // Only send guestEmail for unauthenticated users with a filled email
+        // Authenticated users have their email from the JWT — sending empty string fails @IsEmail validation
+        if (!isLoggedIn && email.trim()) {
+          request.guestEmail = email.trim();
+        }
       }
 
       // Update payment method in request
