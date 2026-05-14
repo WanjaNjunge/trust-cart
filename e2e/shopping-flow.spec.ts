@@ -15,13 +15,13 @@ test.describe('Shopping Flow', () => {
     await setAuthInBrowser(page, auth);
   });
 
-  test('add product to cart updates header cart count', async ({ page }) => {
+  test('add product to cart updates header cart count', { tag: ['@regression'] }, async ({ page }) => {
     const productPage = new ProductPage(page);
     await productPage.goto(SLUGS.product);
     await productPage.addToCart();
   });
 
-  test('cart page shows added items with prices', async ({ page }) => {
+  test('cart page shows added items with prices', { tag: ['@regression'] }, async ({ page }) => {
     await addToCartApi(auth.token, SLUGS.product);
 
     const cartPage = new CartPage(page);
@@ -31,7 +31,7 @@ test.describe('Shopping Flow', () => {
     await expect(cartPage.checkoutLink).toBeVisible();
   });
 
-  test('removing item from cart updates total', async ({ page }) => {
+  test('removing item from cart updates total', { tag: ['@regression'] }, async ({ page }) => {
     await addToCartApi(auth.token, SLUGS.product);
 
     const cartPage = new CartPage(page);
@@ -41,7 +41,7 @@ test.describe('Shopping Flow', () => {
     await expect(page.getByText(/HP EliteBook|hp elitebook/i)).not.toBeVisible({ timeout: 8_000 });
   });
 
-  test('applying invalid promo code shows error', async ({ page }) => {
+  test('applying invalid promo code shows error', { tag: ['@regression'] }, async ({ page }) => {
     await addToCartApi(auth.token, SLUGS.product);
 
     const cartPage = new CartPage(page);
@@ -51,7 +51,8 @@ test.describe('Shopping Flow', () => {
   });
 
   // MPesa stub auto-confirms after 5 s; checkout polls every 3 s, max 12 attempts
-  test('full checkout flow: add to cart → checkout → order confirmation', async ({ page }) => {
+  // @critical but NOT @smoke — 90 s stub delay makes it unsuitable for a PR gate
+  test('full checkout flow: add to cart → checkout → order confirmation', { tag: ['@critical', '@regression'] }, async ({ page }) => {
     test.setTimeout(90_000);
 
     await test.step('seed cart via API', async () => {

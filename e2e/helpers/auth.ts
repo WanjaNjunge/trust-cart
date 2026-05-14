@@ -1,3 +1,9 @@
+/**
+ * Auth Helper — login and logout utilities for tests.
+ * Prefer loginViaApi + setAuthInBrowser for speed (~200ms vs 3-4s via UI).
+ * Use loginViaUi / logoutViaUi only when testing the auth UI flows directly.
+ */
+
 import type { Page } from '@playwright/test';
 import { loginApi } from './api';
 

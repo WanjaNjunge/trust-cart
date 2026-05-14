@@ -26,7 +26,7 @@ async function createPendingOrder(): Promise<{ id: string; orderNumber: string }
 // ─── Access control ───────────────────────────────────────────────────────────
 
 test.describe('Admin Access Control', () => {
-  test('customer cannot access /admin (redirected or 403)', async ({ page }) => {
+  test('customer cannot access /admin (redirected or 403)', { tag: ['@smoke', '@critical', '@regression'] }, async ({ page }) => {
     const auth = await loginViaApi(USERS.customer.email, USERS.customer.password);
     await setAuthInBrowser(page, auth);
     await page.goto('/admin');
@@ -34,7 +34,7 @@ test.describe('Admin Access Control', () => {
     await expect(page).not.toHaveURL(/\/admin/, { timeout: 8_000 });
   });
 
-  test('staff can access admin dashboard', async ({ page }) => {
+  test('staff can access admin dashboard', { tag: ['@regression'] }, async ({ page }) => {
     const auth = await loginViaApi(USERS.staff.email, USERS.staff.password);
     await setAuthInBrowser(page, auth);
     await page.goto('/admin');
@@ -50,7 +50,7 @@ test.describe('Admin Dashboard', () => {
     await setAuthInBrowser(page, auth);
   });
 
-  test('dashboard loads with real stats cards', async ({ page }) => {
+  test('dashboard loads with real stats cards', { tag: ['@smoke', '@regression'] }, async ({ page }) => {
     await page.goto('/admin');
     // All four stat cards visible
     await expect(page.getByText(/total revenue/i)).toBeVisible({ timeout: 10_000 });
@@ -59,7 +59,7 @@ test.describe('Admin Dashboard', () => {
     await expect(page.getByText(/total customers/i)).toBeVisible();
   });
 
-  test('dashboard stats are real numbers, not the old hardcoded stub', async ({ page }) => {
+  test('dashboard stats are real numbers, not the old hardcoded stub', { tag: ['@regression'] }, async ({ page }) => {
     await page.goto('/admin');
     // Wait for stats section to fully render before asserting on body text
     await expect(page.getByText(/total revenue/i)).toBeVisible({ timeout: 10_000 });
@@ -81,14 +81,14 @@ test.describe('Admin Products', () => {
     await setAuthInBrowser(page, auth);
   });
 
-  test('products page loads with product list', async ({ page }) => {
+  test('products page loads with product list', { tag: ['@regression'] }, async ({ page }) => {
     await page.goto('/admin/products');
     await expect(page.getByRole('heading', { name: /products/i })).toBeVisible({ timeout: 10_000 });
     // At least one product row
     await expect(page.locator('tbody tr').first()).toBeVisible({ timeout: 10_000 });
   });
 
-  test('search filters the product list', async ({ page }) => {
+  test('search filters the product list', { tag: ['@regression'] }, async ({ page }) => {
     await page.goto('/admin/products');
     await page.locator('input[placeholder*="search" i]').fill('HP');
     const rows = page.locator('tbody tr');
@@ -96,7 +96,7 @@ test.describe('Admin Products', () => {
     await expect(rows.first()).toContainText(/hp/i, { timeout: 8_000 });
   });
 
-  test('navigating to new product page shows create form', async ({ page }) => {
+  test('navigating to new product page shows create form', { tag: ['@regression'] }, async ({ page }) => {
     await page.goto('/admin/products/new');
     await expect(page.locator('form')).toBeVisible({ timeout: 10_000 });
     await expect(page.locator('input[name="name"], input[placeholder*="name" i]').first()).toBeVisible();
@@ -111,7 +111,7 @@ test.describe('Admin Inventory', () => {
     await setAuthInBrowser(page, auth);
   });
 
-  test('inventory page loads with stock levels', async ({ page }) => {
+  test('inventory page loads with stock levels', { tag: ['@regression'] }, async ({ page }) => {
     await page.goto('/admin/inventory');
     await expect(page.getByRole('heading', { name: /inventory/i })).toBeVisible({ timeout: 10_000 });
     await expect(page.locator('tbody tr').first()).toBeVisible({ timeout: 10_000 });
@@ -120,7 +120,7 @@ test.describe('Admin Inventory', () => {
     await expect(page.getByText(/reorder/i)).toBeVisible();
   });
 
-  test('adjust stock modal opens and submits', async ({ page }) => {
+  test('adjust stock modal opens and submits', { tag: ['@regression'] }, async ({ page }) => {
     await page.goto('/admin/inventory');
     const adjustBtn = page.getByRole('button', { name: /adjust/i }).first();
     await expect(adjustBtn).toBeVisible({ timeout: 10_000 });
@@ -140,7 +140,7 @@ test.describe('Admin Inventory', () => {
     await expect(page.getByText(/adjust.*success|success.*adjust|adjusted successfully/i)).toBeVisible({ timeout: 8_000 });
   });
 
-  test('search filters the inventory list', async ({ page }) => {
+  test('search filters the inventory list', { tag: ['@regression'] }, async ({ page }) => {
     await page.goto('/admin/inventory');
     await page.locator('input[placeholder*="search" i]').fill('HP');
     const rows = page.locator('tbody tr');
@@ -162,13 +162,13 @@ test.describe('Admin Orders', () => {
     await setAuthInBrowser(page, auth);
   });
 
-  test('orders page loads with order list', async ({ page }) => {
+  test('orders page loads with order list', { tag: ['@regression'] }, async ({ page }) => {
     await page.goto('/admin/orders');
     await expect(page.getByRole('heading', { name: /orders/i })).toBeVisible({ timeout: 10_000 });
     await expect(page.getByText(pendingOrderNumber)).toBeVisible({ timeout: 10_000 });
   });
 
-  test('status filter works', async ({ page }) => {
+  test('status filter works', { tag: ['@regression'] }, async ({ page }) => {
     await page.goto('/admin/orders');
     // Wait for initial load
     await expect(page.locator('tbody tr').first()).toBeVisible({ timeout: 10_000 });
@@ -184,7 +184,7 @@ test.describe('Admin Orders', () => {
     }
   });
 
-  test('update order status with valid transition', async ({ page }) => {
+  test('update order status with valid transition', { tag: ['@regression'] }, async ({ page }) => {
     await page.goto('/admin/orders');
 
     // Search for our order by order number
@@ -207,7 +207,7 @@ test.describe('Admin Orders', () => {
     await expect(page.getByText(/updated|success/i)).toBeVisible({ timeout: 8_000 });
   });
 
-  test('refund button is visible for Manager role', async ({ page }) => {
+  test('refund button is visible for Manager role', { tag: ['@regression'] }, async ({ page }) => {
     const auth = await loginViaApi(USERS.manager.email, USERS.manager.password);
     await setAuthInBrowser(page, auth);
     await page.goto('/admin/orders');
@@ -223,7 +223,7 @@ test.describe('Admin Orders', () => {
     }
   });
 
-  test('refund button is NOT visible for Staff role', async ({ page }) => {
+  test('refund button is NOT visible for Staff role', { tag: ['@critical', '@regression'] }, async ({ page }) => {
     const auth = await loginViaApi(USERS.staff.email, USERS.staff.password);
     await setAuthInBrowser(page, auth);
     await page.goto('/admin/orders');

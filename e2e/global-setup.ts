@@ -1,3 +1,12 @@
+/**
+ * Global Setup — runs once before the entire test suite.
+ * Verifies both servers are reachable, resets the database to a clean
+ * known state via seed, then confirms the API recovered before tests begin.
+ * If any step fails, the suite aborts with a descriptive error.
+ */
+
+
+import { execSync } from 'child_process';
 import { verifyServerReachable } from './helpers/api';
 
 async function waitForServer(url: string, label: string, maxWaitMs = 60_000): Promise<void> {
@@ -29,13 +38,17 @@ export default async function globalSetup() {
   await waitForServer('http://localhost:3000', 'Web app (port 3000)');
   console.log('  ✓ Web app reachable');
 
-  // Verify seed data exists by checking a known product slug
-  const res = await fetch('http://localhost:3001/api/v1/products/slug/hp-elitebook-840-g6');
-  if (!res.ok) {
-    throw new Error(
-      'Seed data missing. Run: pnpm db:seed\n' +
-        'Expected product slug "hp-elitebook-840-g6" not found.',
-    );
-  }
-  console.log('  ✓ Seed data verified\n');
+  // Reset database to a known clean state before every test run.
+  // This resets quantityOnHand=20 and quantityReserved=0 for all products,
+  // preventing INSUFFICIENT_STOCK failures caused by confirmed orders from
+  // previous runs depleting inventory.
+  console.log('  Seeding database...');
+  execSync('pnpm db:seed', { cwd: process.cwd(), stdio: 'pipe' });
+  console.log('  ✓ Database seeded — inventory reset');
+
+  // Re-verify the API is still responsive after the seed's DB operations complete.
+  // The seed briefly saturates the PostgreSQL connection pool; without this check
+  // the first few tests can hit ECONNREFUSED while the server recovers.
+  await waitForServer('http://localhost:3001/api/v1/products', 'API post-seed');
+  console.log('  ✓ API healthy after seed\n');
 }

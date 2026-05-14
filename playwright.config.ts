@@ -15,7 +15,7 @@ export default defineConfig({
   },
   projects: [
     {
-      // Full regression suite — no grep filter, runs all 56 tests
+      // Full regression suite — no grep filter, runs all 86 tests
       name: 'chromium',
       use: { browserName: 'chromium' },
     },
@@ -26,6 +26,13 @@ export default defineConfig({
       grep: /@smoke/,
       use: { browserName: 'chromium' },
     },
+
+    // Cross-browser projects — disabled while running against a local dev server
+    // (limited resources). Enable for staging/production CI on a nightly schedule.
+    // The smoke suite stays Chromium-only for PR speed; regression runs cross-browser.
+    // { name: 'firefox', grep: /@regression/, use: { browserName: 'firefox' } },
+    // { name: 'webkit',  grep: /@regression/, use: { browserName: 'webkit'  } },
   ],
   globalSetup: './e2e/global-setup.ts',
+  globalTeardown: './e2e/global-teardown.ts',
 });

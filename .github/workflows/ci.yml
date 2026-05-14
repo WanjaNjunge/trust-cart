@@ -190,6 +190,133 @@ jobs:
       #     name: web-build
       #     path: apps/web/.next
 
+  test-e2e:
+    name: E2E Tests (Playwright — Smoke Suite)
+    runs-on: ubuntu-latest
+    needs: build
+    timeout-minutes: 15
+
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_USER: trustcart
+          POSTGRES_PASSWORD: trustcart_local
+          POSTGRES_DB: trustcart_dev
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Playwright Chromium
+        run: npx playwright install chromium --with-deps
+
+      - name: Build shared package
+        run: pnpm --filter @trustcart/shared build
+
+      - name: Generate Prisma client
+        run: pnpm db:generate
+
+      - name: Run database migrations
+        run: pnpm --filter api prisma migrate deploy
+        env:
+          DATABASE_URL: postgresql://trustcart:trustcart_local@localhost:5432/trustcart_dev
+
+      - name: Seed database
+        run: pnpm db:seed
+        env:
+          DATABASE_URL: postgresql://trustcart:trustcart_local@localhost:5432/trustcart_dev
+          REDIS_HOST: localhost
+          REDIS_PORT: 6379
+          JWT_SECRET: ci-e2e-not-for-production
+
+      - name: Create API env file
+        run: |
+          cat > apps/api/.env.local << 'EOF'
+          NODE_ENV=test
+          PORT=3001
+          DATABASE_URL=postgresql://trustcart:trustcart_local@localhost:5432/trustcart_dev
+          REDIS_HOST=localhost
+          REDIS_PORT=6379
+          REDIS_PASSWORD=
+          JWT_SECRET=ci-e2e-not-for-production
+          JWT_ACCESS_EXPIRY=15m
+          EMAIL_ENABLED=false
+          CORS_ORIGINS=http://localhost:3000
+          EOF
+
+      - name: Create web env file
+        run: |
+          cat > apps/web/.env.local << 'EOF'
+          NEXT_PUBLIC_API_URL=http://localhost:3001/api/v1
+          NEXT_PUBLIC_SITE_URL=http://localhost:3000
+          NEXT_PUBLIC_ENABLE_POD=true
+          EOF
+
+      - name: Start API server
+        run: pnpm dev:api &
+
+      - name: Start web server
+        run: pnpm dev:web &
+
+      - name: Wait for servers to be ready
+        run: |
+          npx wait-on \
+            http-get://localhost:3001/api/v1/products \
+            http-get://localhost:3000 \
+            --timeout 60000 \
+            --interval 2000
+
+      - name: Run E2E smoke suite
+        run: pnpm e2e:smoke
+
+      - name: Upload Playwright HTML report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-report-${{ github.run_number }}
+          path: playwright-report/
+          retention-days: 14
+
+      - name: Upload test result screenshots on failure
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: test-results-${{ github.run_number }}
+          path: test-results/
+          retention-days: 7
+
   # Placeholder for future deployment stages
   # deploy-dev:
   #   name: Deploy to Dev

@@ -33,13 +33,13 @@ test.describe('Order Management (Customer)', () => {
     await setAuthInBrowser(page, auth);
   });
 
-  test('order history page shows user orders', async ({ page }) => {
+  test('order history page shows user orders', { tag: ['@regression'] }, async ({ page }) => {
     await page.goto('/orders');
     await expect(page.getByRole('heading', { name: /your orders/i })).toBeVisible({ timeout: 10_000 });
     await expect(page.getByText(confirmedOrderNumber)).toBeVisible({ timeout: 10_000 });
   });
 
-  test('order detail page shows items, address, and status timeline', async ({ page }) => {
+  test('order detail page shows items, address, and status timeline', { tag: ['@regression'] }, async ({ page }) => {
     await page.goto(`/orders/${confirmedOrderId}`);
     await expect(page.getByText(confirmedOrderNumber)).toBeVisible({ timeout: 10_000 });
 
@@ -53,7 +53,7 @@ test.describe('Order Management (Customer)', () => {
     await expect(timelineSection.getByText(/Pending Payment/i)).toBeVisible();
   });
 
-  test('unauthenticated access to orders shows login prompt', async ({ page }) => {
+  test('unauthenticated access to orders shows login prompt', { tag: ['@regression'] }, async ({ page }) => {
     // Orders page uses a LoginPrompt component — it stays at /orders (no redirect)
     await page.evaluate(() => localStorage.clear());
     await page.goto('/orders');
@@ -63,7 +63,7 @@ test.describe('Order Management (Customer)', () => {
     });
   });
 
-  test('order detail shows cancel button for PENDING_PAYMENT orders', async ({ page }) => {
+  test('order detail shows cancel button for PENDING_PAYMENT orders', { tag: ['@regression'] }, async ({ page }) => {
     await page.goto(`/orders/${confirmedOrderId}`);
     await expect(page.getByText(confirmedOrderNumber)).toBeVisible({ timeout: 10_000 });
     // The cancel button opens a CancelOrderModal
@@ -71,7 +71,7 @@ test.describe('Order Management (Customer)', () => {
     await expect(cancelBtn).toBeVisible({ timeout: 10_000 });
   });
 
-  test('cancel order changes status to CANCELLED', async ({ page }) => {
+  test('cancel order changes status to CANCELLED', { tag: ['@regression'] }, async ({ page }) => {
     const auth = await loginViaApi(USERS.customer.email, USERS.customer.password);
     const addresses = await getUserAddresses(auth.token);
     const defaultAddress = addresses.find((a) => a.isDefault) ?? addresses[0];

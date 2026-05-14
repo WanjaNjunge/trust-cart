@@ -1,3 +1,9 @@
+/**
+ * API Helper — centralised HTTP client for all test suite API calls.
+ * Wraps fetch with auth headers, JSON handling, and descriptive error messages.
+ * All other helpers and fixtures call through here — never fetch directly in tests.
+ */
+
 const API = 'http://localhost:3001/api/v1';
 
 interface LoginResponse {
