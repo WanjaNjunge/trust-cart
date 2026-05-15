@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
-import { Plus, Search, Edit, Trash2, Filter, X } from 'lucide-react';
+import { Plus, Search, Edit, Trash2, X } from 'lucide-react';
 import { authenticatedFetchApi, authenticatedRequest } from '@/lib/api';
 import { ProductListResponseDto } from '@/lib/types';
 import { useRouter } from 'next/navigation';
