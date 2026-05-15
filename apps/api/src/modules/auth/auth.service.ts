@@ -1,6 +1,7 @@
 import { randomBytes } from 'crypto';
 import {
   Injectable,
+  Logger,
   UnauthorizedException,
   ConflictException,
   BadRequestException,
@@ -23,6 +24,8 @@ const passwordResetTokens = new Map<string, { userId: string; expiresAt: Date }>
 
 @Injectable()
 export class AuthService {
+  private readonly logger = new Logger(AuthService.name);
+
   constructor(
     private readonly prisma: PrismaService,
     private readonly jwtService: JwtService,
@@ -126,7 +129,6 @@ export class AuthService {
 
     // Always return success to prevent email enumeration
     if (!user) {
-      console.log(`[Auth] Password reset requested for non-existent email: ${dto.email}`);
       return { message: 'If the email exists, a password reset link has been sent' };
     }
 
@@ -137,9 +139,8 @@ export class AuthService {
     // Store token (in production, use Redis or database)
     passwordResetTokens.set(token, { userId: user.id, expiresAt });
 
-    // Log the reset link (in production, send email)
-    console.log(`[Auth] Password reset token for ${user.email}: ${token}`);
-    console.log(`[Auth] Reset link: http://localhost:3000/reset-password?token=${token}`);
+    // TODO(FIND-004 Phase 2): replace in-memory store with Redis SETEX
+    this.logger.log(`Password reset requested for user: ${user.id}`);
 
     return { message: 'If the email exists, a password reset link has been sent' };
   }
