@@ -19,9 +19,9 @@
 
 | ID | Finding | Status | Files Touched | Verification |
 |----|---------|--------|--------------|-------------|
-| FIND-001 | Insecure reset token generation (`Math.random()`) | ⬜ OPEN | | |
-| FIND-002 | Reset tokens logged in plaintext | ⬜ OPEN | | |
-| FIND-003 | JWT never invalidated / no logout / `JWT_EXPIRES_IN` mismatch | ⬜ OPEN | | |
+| FIND-001 | Insecure reset token generation (`Math.random()`) | ✅ RESOLVED | `auth.service.ts`, `auth.service.spec.ts` | 3 unit tests pass; `Math.random` not called |
+| FIND-002 | Reset tokens logged in plaintext | ✅ RESOLVED | `auth.service.ts` | `grep console.log apps/api/src/modules/auth/` → 0 matches |
+| FIND-003 | JWT never invalidated / no logout / `JWT_EXPIRES_IN` mismatch | ✅ RESOLVED | `auth.service.ts`, `auth.controller.ts`, `jwt.strategy.ts`, `auth.module.ts`, `redis/`, `app.module.ts`, `e2e/auth.spec.ts` | 4 unit tests pass; e2e blacklist round-trip test written; `JWT_EXPIRES_IN` removed from src |
 
 ---
 
