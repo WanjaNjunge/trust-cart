@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { USERS } from './fixtures/users';
 import { loginViaApi, setAuthInBrowser } from './helpers/auth';
+import { apiRequest } from './helpers/api';
 
 test.describe('Authentication', () => {
   test('register with valid data creates account', { tag: ['@regression'] }, async ({ page }) => {
@@ -101,5 +102,38 @@ test.describe('Authentication', () => {
     });
     await page.goto('/account');
     await expect(page).toHaveURL(/login/, { timeout: 8_000 });
+  });
+});
+
+// ─── FIND-003: JWT blacklist / server-side logout ────────────────────────────
+
+test.describe('JWT logout blacklist (FIND-003)', () => {
+  test('login → authenticated request OK → logout → same token rejected 401 @smoke', async () => {
+    // 1. Login and obtain token
+    const loginData = await apiRequest<{ accessToken: string }>(
+      'POST', '/auth/login',
+      { email: USERS.admin.email, password: USERS.admin.password },
+    );
+    const token = loginData.accessToken;
+    expect(typeof token).toBe('string');
+
+    // 2. Token works — GET /users/me returns 200
+    const profileBefore = await apiRequest<{ id: string }>('GET', '/users/me', undefined, token);
+    expect(typeof profileBefore.id).toBe('string');
+
+    // 3. Logout — server blacklists the JTI in Redis
+    await apiRequest('POST', '/auth/logout', {}, token);
+
+    // 4. Same token now returns 401
+    const API = 'http://localhost:3001/api/v1';
+    const res = await fetch(`${API}/users/me`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(res.status).toBe(401);
+  });
+
+  test('logout with no token returns 200 gracefully', async () => {
+    const result = await apiRequest<{ message: string }>('POST', '/auth/logout', {});
+    expect(result.message).toMatch(/logged out/i);
   });
 });

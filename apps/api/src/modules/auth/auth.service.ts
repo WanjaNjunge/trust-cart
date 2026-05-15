@@ -1,4 +1,4 @@
-import { randomBytes } from 'crypto';
+import { randomBytes, randomUUID } from 'crypto';
 import {
   Injectable,
   Logger,
@@ -9,6 +9,7 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { PrismaService } from '../prisma';
+import { RedisService } from '../redis';
 import { RegisterDto, LoginDto, ForgotPasswordDto, ResetPasswordDto } from './dto';
 
 const BCRYPT_ROUNDS = 10;
@@ -17,6 +18,7 @@ interface TokenPayload {
   sub: string;
   email: string;
   role: string;
+  jti: string;
 }
 
 // In-memory store for password reset tokens (use Redis in production)
@@ -29,6 +31,7 @@ export class AuthService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly jwtService: JwtService,
+    private readonly redis: RedisService,
   ) {}
 
   async register(dto: RegisterDto) {
@@ -83,11 +86,12 @@ export class AuthService {
       data: { lastLoginAt: new Date() },
     });
 
-    // Generate JWT
+    // Generate JWT with JTI for revocation support
     const payload: TokenPayload = {
       sub: user.id,
       email: user.email,
       role: user.role,
+      jti: randomUUID(),
     };
 
     const accessToken = this.jwtService.sign(payload);
@@ -102,6 +106,18 @@ export class AuthService {
         role: user.role,
       },
     };
+  }
+
+  async logout(rawToken: string): Promise<void> {
+    const decoded = this.jwtService.decode(rawToken) as { jti?: string; exp?: number } | null;
+    if (!decoded?.jti || !decoded.exp) {
+      // Token has no JTI — nothing to blacklist; it will expire naturally.
+      return;
+    }
+    const ttlSeconds = Math.max(0, decoded.exp - Math.floor(Date.now() / 1000));
+    if (ttlSeconds > 0) {
+      await this.redis.setex(`jwt:blacklist:${decoded.jti}`, ttlSeconds, '1');
+    }
   }
 
   async validateUser(email: string, password: string) {

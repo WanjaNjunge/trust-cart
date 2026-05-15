@@ -13,6 +13,7 @@ import { OrdersModule } from './modules/orders';
 import { PaymentsModule } from './modules/payments/payments.module';
 import { NotificationsModule } from './modules/notifications';
 import { AdminModule } from './modules/admin/admin.module';
+import { RedisModule } from './modules/redis';
 
 @Module({
   imports: [
@@ -33,6 +34,9 @@ import { AdminModule } from './modules/admin/admin.module';
         },
       }),
     }),
+
+    // Redis client (global — used by auth blacklist, Phase 2 reset tokens)
+    RedisModule,
 
     // Database module
     PrismaModule,

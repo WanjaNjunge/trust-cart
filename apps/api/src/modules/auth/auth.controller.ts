@@ -1,5 +1,5 @@
-import { Controller, Post, Body, HttpCode, HttpStatus } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
+import { Controller, Post, Body, Headers, HttpCode, HttpStatus } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse, ApiBody, ApiBearerAuth } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { RegisterDto, LoginDto, ForgotPasswordDto, ResetPasswordDto } from './dto';
 
@@ -25,6 +25,17 @@ export class AuthController {
   @ApiResponse({ status: 401, description: 'Invalid credentials' })
   async login(@Body() dto: LoginDto) {
     return this.authService.login(dto);
+  }
+
+  @Post('logout')
+  @HttpCode(HttpStatus.OK)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Invalidate current JWT token' })
+  @ApiResponse({ status: 200, description: 'Logged out successfully' })
+  async logout(@Headers('authorization') authHeader: string) {
+    const token = authHeader?.replace(/^Bearer\s+/i, '') ?? '';
+    await this.authService.logout(token);
+    return { message: 'Logged out successfully' };
   }
 
   @Post('forgot-password')
