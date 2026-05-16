@@ -1,6 +1,8 @@
 import { Module } from '@nestjs/common';
+import { APP_GUARD } from '@nestjs/core';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { BullModule } from '@nestjs/bullmq';
+import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { HealthController } from './health.controller';
 import { PrismaModule } from './modules/prisma';
 import { ProductsModule } from './modules/products';
@@ -35,7 +37,13 @@ import { RedisModule } from './modules/redis';
       }),
     }),
 
-    // Redis client (global — used by auth blacklist, Phase 2 reset tokens)
+    // Rate limiting — two tiers: general (20 req/60s) and strict (5 req/60s for auth)
+    ThrottlerModule.forRoot([
+      { name: 'general', ttl: 60000, limit: 20 },
+      { name: 'strict', ttl: 60000, limit: 5 },
+    ]),
+
+    // Redis client (global — used by auth blacklist, reset tokens)
     RedisModule,
 
     // Database module
@@ -62,7 +70,10 @@ import { RedisModule } from './modules/redis';
     AdminModule,
   ],
   controllers: [HealthController],
-  providers: [],
+  providers: [
+    // Global rate limiter — applies ThrottlerModule tiers to every route
+    { provide: APP_GUARD, useClass: ThrottlerGuard },
+  ],
 })
 export class AppModule { }
 
