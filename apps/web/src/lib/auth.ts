@@ -1,28 +1,44 @@
 // ===========================================
-// Auth Token Management
+// Auth State Management (FIND-016)
+//
+// JWT is now stored in an HttpOnly cookie set by the server.
+// JavaScript cannot read the cookie — it is sent automatically
+// by the browser on every credentialed request.
+//
+// This file manages the non-sensitive user profile data in
+// localStorage (id, email, name, role — needed for UI rendering).
+// The actual auth credential (JWT) never touches JS memory.
 // ===========================================
 
-const TOKEN_KEY = 'trustcart_token';
 const USER_KEY = 'trustcart_user';
 
-export function getToken(): string | null {
-  if (typeof window === 'undefined') return null;
-  return localStorage.getItem(TOKEN_KEY);
+// getToken / setToken removed — token is in HttpOnly cookie, not accessible to JS.
+
+/** True when user data exists in localStorage (set after successful login). */
+export function isAuthenticated(): boolean {
+  if (typeof window === 'undefined') return false;
+  return !!localStorage.getItem(USER_KEY);
 }
 
-export function setToken(token: string): void {
-  if (typeof window === 'undefined') return;
-  localStorage.setItem(TOKEN_KEY, token);
-}
-
+/**
+ * Clear local user data from localStorage.
+ * The actual JWT cookie is cleared server-side via POST /auth/logout.
+ */
 export function clearToken(): void {
   if (typeof window === 'undefined') return;
-  localStorage.removeItem(TOKEN_KEY);
   localStorage.removeItem(USER_KEY);
 }
 
-export function isAuthenticated(): boolean {
-  return !!getToken();
+// getToken kept as a no-op shim so any remaining call sites compile without error.
+// It always returns null — the real token travels as an HttpOnly cookie.
+/** @deprecated Token is now in HttpOnly cookie. Always returns null. */
+export function getToken(): string | null {
+  return null;
+}
+
+/** @deprecated Token is set by the server via Set-Cookie. This is a no-op. */
+export function setToken(_token: string): void {
+  // intentional no-op — server owns the cookie
 }
 
 export function getStoredUser(): import('./types').User | null {
@@ -30,7 +46,7 @@ export function getStoredUser(): import('./types').User | null {
   const userStr = localStorage.getItem(USER_KEY);
   if (!userStr) return null;
   try {
-    return JSON.parse(userStr);
+    return JSON.parse(userStr) as import('./types').User;
   } catch {
     return null;
   }

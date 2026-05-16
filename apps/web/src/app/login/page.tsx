@@ -4,7 +4,7 @@ import { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { login } from '@/lib/api';
-import { setToken, setStoredUser, isAuthenticated } from '@/lib/auth';
+import { setStoredUser, isAuthenticated } from '@/lib/auth';
 import { ArrowRight } from 'lucide-react';
 
 function LoginForm() {
@@ -38,7 +38,7 @@ function LoginForm() {
         email: formData.email,
         password: formData.password,
       });
-      setToken(response.accessToken);
+      // JWT is set as an HttpOnly cookie by the server — no localStorage storage needed (FIND-016)
       setStoredUser(response.user);
       router.push('/account');
     } catch (err) {

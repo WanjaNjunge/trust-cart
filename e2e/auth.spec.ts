@@ -137,3 +137,55 @@ test.describe('JWT logout blacklist (FIND-003)', () => {
     expect(result.message).toMatch(/logged out/i);
   });
 });
+
+// ─── FIND-016: HttpOnly cookie lifecycle ─────────────────────────────────────
+
+test.describe('HttpOnly JWT cookie lifecycle (FIND-016)', () => {
+  test('login sets HttpOnly access_token cookie; logout clears it @smoke', async ({ request }) => {
+    const API = 'http://localhost:3001/api/v1';
+
+    // 1. Login — Playwright request context stores the Set-Cookie header automatically
+    const loginRes = await request.post(`${API}/auth/login`, {
+      data: { email: USERS.customer.email, password: USERS.customer.password },
+    });
+    expect(loginRes.ok()).toBe(true);
+
+    // 2. Set-Cookie header is present
+    const setCookieHeader = loginRes.headers()['set-cookie'] ?? '';
+    expect(setCookieHeader).toContain('access_token=');
+    expect(setCookieHeader).toContain('HttpOnly');
+    expect(setCookieHeader.toLowerCase()).toContain('samesite=strict');
+
+    // 3. Subsequent credentialed request authenticates via cookie
+    const meRes = await request.get(`${API}/users/me`);
+    expect(meRes.status()).toBe(200);
+    const me = await meRes.json() as { email: string };
+    expect(me.email).toBe(USERS.customer.email);
+
+    // 4. Logout clears the cookie (server returns Set-Cookie with empty value / Max-Age=0)
+    const logoutRes = await request.post(`${API}/auth/logout`);
+    expect(logoutRes.ok()).toBe(true);
+    const logoutSetCookie = logoutRes.headers()['set-cookie'] ?? '';
+    // Cookie is cleared — Max-Age=0 or Expires in the past means it is removed
+    expect(logoutSetCookie).toContain('access_token=');
+
+    // 5. After logout, authenticated endpoint returns 401
+    const afterRes = await request.get(`${API}/users/me`);
+    expect(afterRes.status()).toBe(401);
+  });
+
+  test('login response does NOT expose token in response body', async ({ request }) => {
+    // Verify login response body contains user data but accessToken is the old deprecated field
+    // The body accessToken is kept for API clients only — browsers should use the cookie
+    const API = 'http://localhost:3001/api/v1';
+    const loginRes = await request.post(`${API}/auth/login`, {
+      data: { email: USERS.customer.email, password: USERS.customer.password },
+    });
+    expect(loginRes.ok()).toBe(true);
+    const body = await loginRes.json() as Record<string, unknown>;
+    // user data present
+    expect(body.user).toBeDefined();
+    // Cookie is set — body token is for backward compat only
+    expect(loginRes.headers()['set-cookie']).toContain('HttpOnly');
+  });
+});

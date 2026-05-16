@@ -1,6 +1,7 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
+import { Request } from 'express';
 import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '../../prisma';
 import { RedisService } from '../../redis';
@@ -11,6 +12,9 @@ interface JwtPayload {
   role: string;
   jti?: string;
 }
+
+// Cookie name used for the HttpOnly JWT — must match auth.controller.ts
+export const JWT_COOKIE_NAME = 'access_token';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
@@ -25,14 +29,18 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     }
 
     super({
-      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      // Cookie (primary — browser/frontend) then Bearer header (fallback — API/e2e clients)
+      jwtFromRequest: ExtractJwt.fromExtractors([
+        (req: Request) => (req?.cookies?.[JWT_COOKIE_NAME] as string | null) ?? null,
+        ExtractJwt.fromAuthHeaderAsBearerToken(),
+      ]),
       ignoreExpiration: false,
       secretOrKey: secret,
     });
   }
 
   async validate(payload: JwtPayload) {
-    // Check token blacklist (populated on logout)
+    // Check JWT blacklist (populated on logout)
     if (payload.jti) {
       const isRevoked = await this.redis.exists(`jwt:blacklist:${payload.jti}`);
       if (isRevoked) {

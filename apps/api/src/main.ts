@@ -2,6 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { ValidationPipe, Logger } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import helmet from 'helmet';
+import cookieParser from 'cookie-parser';
 import { AppModule } from './app.module';
 
 // Known-weak dev placeholder — must never reach non-development environments (FIND-036)
@@ -38,6 +39,9 @@ async function bootstrap(): Promise<void> {
   const apiPrefix = process.env.API_PREFIX || 'api';
   const apiVersion = process.env.API_VERSION || 'v1';
   app.setGlobalPrefix(`${apiPrefix}/${apiVersion}`);
+
+  // Cookie parser — required for HttpOnly JWT cookie extraction (FIND-016)
+  app.use(cookieParser());
 
   // Security headers — applied before CORS and routes (FIND-006)
   app.use(

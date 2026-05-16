@@ -123,23 +123,20 @@ export async function searchProducts(query: string, limit = 20): Promise<Product
 // Auth API
 // ===========================================
 
-import { getToken } from './auth';
+// Token is now an HttpOnly cookie — no import from auth needed for the credential.
+// credentials: 'include' instructs the browser to send the cookie automatically.
 
 export async function authenticatedFetchApi<T>(endpoint: string, options?: RequestInit): Promise<T> {
-  const token = getToken();
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
     ...(options?.headers as Record<string, string>),
   };
 
-  if (token) {
-    headers['Authorization'] = `Bearer ${token}`;
-  }
-
   const url = `${API_BASE_URL}${endpoint}`;
   const response = await fetch(url, {
     ...options,
     headers,
+    credentials: 'include', // sends HttpOnly access_token cookie (FIND-016)
   });
 
   if (!response.ok) {
@@ -261,7 +258,6 @@ function getSessionId(): string {
 }
 
 async function cartFetchApi<T>(endpoint: string, options?: RequestInit): Promise<T> {
-  const token = getToken();
   const sessionId = getSessionId();
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
@@ -269,14 +265,11 @@ async function cartFetchApi<T>(endpoint: string, options?: RequestInit): Promise
     ...(options?.headers as Record<string, string>),
   };
 
-  if (token) {
-    headers['Authorization'] = `Bearer ${token}`;
-  }
-
   const url = `${API_BASE_URL}${endpoint}`;
   const response = await fetch(url, {
     ...options,
     headers,
+    credentials: 'include', // sends HttpOnly access_token cookie for logged-in users (FIND-016)
   });
 
   if (!response.ok) {
