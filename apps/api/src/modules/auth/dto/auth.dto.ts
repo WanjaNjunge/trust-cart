@@ -1,17 +1,23 @@
-import { IsEmail, IsString, MinLength, IsOptional, Matches } from 'class-validator';
+import { IsEmail, IsString, MinLength, MaxLength, IsOptional, Matches } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+
+// Shared password constraints — applied to both RegisterDto and ResetPasswordDto
+const PASSWORD_MIN = 8;
+const PASSWORD_MAX = 128; // bcrypt only hashes first 72 bytes; cap prevents CPU-exhaustion DoS
+const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()\-_=+[\]{};:'",.<>?/\\|`~])/;
+const PASSWORD_REGEX_MESSAGE =
+  'Password must contain at least one lowercase letter, one uppercase letter, one number, and one special character';
 
 export class RegisterDto {
   @ApiProperty({ example: 'user@example.com' })
   @IsEmail()
   email!: string;
 
-  @ApiProperty({ example: 'SecurePass123!', minLength: 8 })
+  @ApiProperty({ example: 'SecurePass123!', minLength: PASSWORD_MIN, maxLength: PASSWORD_MAX })
   @IsString()
-  @MinLength(8)
-  @Matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/, {
-    message: 'Password must contain at least one lowercase, one uppercase, and one number',
-  })
+  @MinLength(PASSWORD_MIN)
+  @MaxLength(PASSWORD_MAX)
+  @Matches(PASSWORD_REGEX, { message: PASSWORD_REGEX_MESSAGE })
   password!: string;
 
   @ApiProperty({ example: 'John' })
@@ -37,6 +43,7 @@ export class LoginDto {
 
   @ApiProperty({ example: 'SecurePass123!' })
   @IsString()
+  @MaxLength(PASSWORD_MAX) // prevent bcrypt DoS on login attempts too
   password!: string;
 }
 
@@ -51,11 +58,10 @@ export class ResetPasswordDto {
   @IsString()
   token!: string;
 
-  @ApiProperty({ example: 'NewSecurePass123!', minLength: 8 })
+  @ApiProperty({ example: 'NewSecurePass123!', minLength: PASSWORD_MIN, maxLength: PASSWORD_MAX })
   @IsString()
-  @MinLength(8)
-  @Matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/, {
-    message: 'Password must contain at least one lowercase, one uppercase, and one number',
-  })
+  @MinLength(PASSWORD_MIN)
+  @MaxLength(PASSWORD_MAX)
+  @Matches(PASSWORD_REGEX, { message: PASSWORD_REGEX_MESSAGE })
   newPassword!: string;
 }
