@@ -1,0 +1,31 @@
+version: 2
+updates:
+  # Root workspace + all apps — pnpm workspaces
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "Africa/Nairobi"
+    open-pull-requests-limit: 5
+    # Do NOT auto-merge — all dependency PRs require human review
+    # before merging (see docs/security/github-environment-protection.md)
+    ignore:
+      # Patch updates are low-risk; group them to reduce noise.
+      # Remove this if you want individual patch PRs.
+      - dependency-name: "*"
+        update-types: ["version-update:semver-patch"]
+    labels:
+      - "dependencies"
+      - "security"
+
+  # GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    labels:
+      - "dependencies"
+      - "ci"
