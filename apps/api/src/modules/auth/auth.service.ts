@@ -13,6 +13,7 @@ import { RedisService } from '../redis';
 import { RegisterDto, LoginDto, ForgotPasswordDto, ResetPasswordDto } from './dto';
 
 const BCRYPT_ROUNDS = 10;
+const RESET_TOKEN_TTL_SECONDS = 24 * 60 * 60; // 24 hours
 
 interface TokenPayload {
   sub: string;
@@ -20,9 +21,6 @@ interface TokenPayload {
   role: string;
   jti: string;
 }
-
-// In-memory store for password reset tokens (use Redis in production)
-const passwordResetTokens = new Map<string, { userId: string; expiresAt: Date }>();
 
 @Injectable()
 export class AuthService {
@@ -35,7 +33,6 @@ export class AuthService {
   ) {}
 
   async register(dto: RegisterDto) {
-    // Check if user already exists
     const existingUser = await this.prisma.user.findUnique({
       where: { email: dto.email.toLowerCase() },
     });
@@ -44,10 +41,8 @@ export class AuthService {
       throw new ConflictException('A user with this email already exists');
     }
 
-    // Hash password
     const passwordHash = await bcrypt.hash(dto.password, BCRYPT_ROUNDS);
 
-    // Create user
     const user = await this.prisma.user.create({
       data: {
         email: dto.email.toLowerCase(),
@@ -80,13 +75,11 @@ export class AuthService {
       throw new UnauthorizedException('Invalid email or password');
     }
 
-    // Update last login
     await this.prisma.user.update({
       where: { id: user.id },
       data: { lastLoginAt: new Date() },
     });
 
-    // Generate JWT with JTI for revocation support
     const payload: TokenPayload = {
       sub: user.id,
       email: user.email,
@@ -111,7 +104,6 @@ export class AuthService {
   async logout(rawToken: string): Promise<void> {
     const decoded = this.jwtService.decode(rawToken) as { jti?: string; exp?: number } | null;
     if (!decoded?.jti || !decoded.exp) {
-      // Token has no JTI — nothing to blacklist; it will expire naturally.
       return;
     }
     const ttlSeconds = Math.max(0, decoded.exp - Math.floor(Date.now() / 1000));
@@ -130,7 +122,6 @@ export class AuthService {
     }
 
     const isPasswordValid = await bcrypt.compare(password, user.passwordHash);
-
     if (!isPasswordValid) {
       return null;
     }
@@ -148,42 +139,38 @@ export class AuthService {
       return { message: 'If the email exists, a password reset link has been sent' };
     }
 
-    // Generate reset token
     const token = this.generateResetToken();
-    const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
 
-    // Store token (in production, use Redis or database)
-    passwordResetTokens.set(token, { userId: user.id, expiresAt });
+    // Store in Redis with 24h TTL — survives restarts, shared across all instances
+    await this.redis.setex(
+      `pwd_reset:${token}`,
+      RESET_TOKEN_TTL_SECONDS,
+      JSON.stringify({ userId: user.id }),
+    );
 
-    // TODO(FIND-004 Phase 2): replace in-memory store with Redis SETEX
     this.logger.log(`Password reset requested for user: ${user.id}`);
 
     return { message: 'If the email exists, a password reset link has been sent' };
   }
 
   async resetPassword(dto: ResetPasswordDto) {
-    const tokenData = passwordResetTokens.get(dto.token);
+    const raw = await this.redis.get(`pwd_reset:${dto.token}`);
 
-    if (!tokenData) {
+    if (!raw) {
       throw new BadRequestException('Invalid or expired reset token');
     }
 
-    if (tokenData.expiresAt < new Date()) {
-      passwordResetTokens.delete(dto.token);
-      throw new BadRequestException('Reset token has expired');
-    }
+    const { userId } = JSON.parse(raw) as { userId: string };
 
-    // Hash new password
+    // Delete before updating password — prevents reuse even if update fails mid-flight
+    await this.redis.del(`pwd_reset:${dto.token}`);
+
     const passwordHash = await bcrypt.hash(dto.newPassword, BCRYPT_ROUNDS);
 
-    // Update user password
     await this.prisma.user.update({
-      where: { id: tokenData.userId },
+      where: { id: userId },
       data: { passwordHash },
     });
-
-    // Remove used token
-    passwordResetTokens.delete(dto.token);
 
     return { message: 'Password has been reset successfully' };
   }
