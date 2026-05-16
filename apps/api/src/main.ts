@@ -4,8 +4,34 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import helmet from 'helmet';
 import { AppModule } from './app.module';
 
+// Known-weak dev placeholder — must never reach non-development environments (FIND-036)
+const INSECURE_JWT_SECRETS = new Set([
+  'trustcart-dev-secret-key-change-in-production',
+  'CHANGE_ME_IN_PRODUCTION_use_a_long_random_string',
+  'secret',
+  'jwt_secret',
+  'changeme',
+]);
+
 async function bootstrap(): Promise<void> {
   const logger = new Logger('Bootstrap');
+
+  // Startup validation — fail fast on missing or insecure secrets (FIND-036, FIND-037 partial)
+  const jwtSecret = process.env.JWT_SECRET;
+  if (!jwtSecret) {
+    throw new Error('FATAL: JWT_SECRET environment variable is not set');
+  }
+  if (process.env.NODE_ENV !== 'development' && process.env.NODE_ENV !== 'test') {
+    if (INSECURE_JWT_SECRETS.has(jwtSecret) || jwtSecret.length < 32) {
+      throw new Error(
+        'FATAL: JWT_SECRET is a known-weak dev placeholder. Generate a strong secret before deploying.',
+      );
+    }
+  }
+  if (!process.env.DATABASE_URL) {
+    throw new Error('FATAL: DATABASE_URL environment variable is not set');
+  }
+
   const app = await NestFactory.create(AppModule);
 
   // Global prefix
