@@ -29,13 +29,13 @@
 
 | ID | Finding | Status | Files Touched | Verification |
 |----|---------|--------|--------------|-------------|
-| FIND-004 | Reset tokens in in-memory Map | ⬜ OPEN | | |
-| FIND-005 | No rate limiting | ⬜ OPEN | | |
-| FIND-006 | No Helmet.js | ⬜ OPEN | | |
-| FIND-007 | Swagger exposed in production | ⬜ OPEN | | |
-| FIND-008 | No max password length (bcrypt DoS) | ⬜ OPEN | | |
-| FIND-022 | No logout endpoint *(Phase 1 sub-task)* | ⬜ OPEN | | |
-| FIND-036 | Weak JWT secret in local `.env` | ⬜ OPEN | | |
+| FIND-004 | Reset tokens in in-memory Map | ✅ RESOLVED | `auth.service.ts`, `redis.service.ts`, `auth.service.spec.ts` | 4 unit tests; Map fully removed; Redis `pwd_reset:{token}` with 86400s TTL |
+| FIND-005 | No rate limiting | ✅ RESOLVED | `app.module.ts`, `auth.controller.ts`, `auth.throttle.spec.ts` | 7 config tests; ThrottlerGuard global; strict 5/60s on all auth endpoints |
+| FIND-006 | No Helmet.js | ✅ RESOLVED | `main.ts`, `main.spec.ts` | 3 tests; helmet applied before CORS; CSP restricts defaultSrc/frameSrc/objectSrc |
+| FIND-007 | Swagger exposed in production | ✅ RESOLVED | `main.ts`, `main.spec.ts` | 2 tests; SwaggerModule.setup() inside NODE_ENV !== production guard |
+| FIND-008 | No max password length (bcrypt DoS) | ✅ RESOLVED | `auth.dto.ts`, `auth.dto.spec.ts` | 9 tests; @MaxLength(128) on all 3 DTOs; special char now required |
+| FIND-022 | No logout endpoint *(completed Phase 1)* | ✅ RESOLVED | `auth.controller.ts` | Phase 1 — see FIND-003 |
+| FIND-036 | Weak JWT secret in local `.env` | ✅ RESOLVED | `main.ts`, `main.spec.ts`, `.env` (gitignored) | 5 tests; startup throws FATAL on weak secret in non-dev/test; local .env rotated |
 
 ---
 
