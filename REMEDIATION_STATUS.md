@@ -43,10 +43,10 @@
 
 | ID | Finding | Status | Files Touched | Verification |
 |----|---------|--------|--------------|-------------|
-| FIND-016 | JWT in localStorage | ⬜ OPEN | | |
-| FIND-029 | No dependency CVE scanning in CI | ⬜ OPEN | | |
-| FIND-031 | No TLS/HTTPS enforcement | ⬜ OPEN (runbook) | | |
-| FIND-033 | No production environment protection | ⬜ OPEN (runbook) | | |
+| FIND-016 | JWT in localStorage | ✅ RESOLVED | `jwt.strategy.ts`, `auth.controller.ts`, `main.ts`, `auth.ts` (web), `api.ts` (web), `login/page.tsx`, `e2e/helpers/auth.ts`, `e2e/auth.spec.ts` | 2 e2e tests verify Set-Cookie HttpOnly; `getToken()` always returns null; `credentials:'include'` on all fetch calls |
+| FIND-029 | No dependency CVE scanning in CI | ✅ RESOLVED | `.github/workflows/ci.yml`, `.github/dependabot.yml` | `security-audit` job added (pnpm audit --audit-level=high); Dependabot weekly; auto-merge disabled |
+| FIND-031 | No TLS/HTTPS enforcement | 📄 DEFERRED | `docs/security/tls-deployment.md` | Runbook covers Railway/Render/Fly.io, nginx, Caddy, HSTS config, post-deploy verification |
+| FIND-033 | No production environment protection | 📄 DEFERRED | `docs/security/github-environment-protection.md` | Runbook covers branch protection, 2-reviewer production env, secrets isolation, CODEOWNERS |
 
 ---
 
