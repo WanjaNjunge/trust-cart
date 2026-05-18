@@ -1,4 +1,4 @@
-import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
+import { Injectable, CanActivate, ExecutionContext, ForbiddenException } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { ROLES_KEY } from '../decorators';
 
@@ -12,8 +12,12 @@ export class RolesGuard implements CanActivate {
       context.getClass(),
     ]);
 
-    if (!requiredRoles) {
-      return true;
+    // Deny-by-default (FIND-009): if @Roles() is missing from a route that has
+    // RolesGuard applied, the developer made an error — never silently grant access.
+    if (!requiredRoles || requiredRoles.length === 0) {
+      throw new ForbiddenException(
+        'Access denied: no roles defined for this endpoint. Apply @Roles() to explicitly allow access.',
+      );
     }
 
     const { user } = context.switchToHttp().getRequest();
