@@ -1,5 +1,1 @@
-/**
- * Exception filters
- * Add custom exception filters here
- */
-export {};
+export { GlobalExceptionFilter } from './http-exception.filter';
