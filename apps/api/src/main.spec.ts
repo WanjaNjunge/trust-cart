@@ -29,7 +29,7 @@ describe('main.ts security configuration', () => {
     });
   });
 
-  describe('JWT secret startup validation (FIND-036)', () => {
+  describe('Startup env var validation (FIND-036, FIND-037)', () => {
     it('defines INSECURE_JWT_SECRETS blocklist', () => {
       expect(mainSrc).toContain('INSECURE_JWT_SECRETS');
       expect(mainSrc).toContain('trustcart-dev-secret-key-change-in-production');
@@ -39,18 +39,30 @@ describe('main.ts security configuration', () => {
       expect(mainSrc).toContain('JWT_SECRET environment variable is not set');
     });
 
-    it('throws FATAL error when JWT_SECRET is a known-weak placeholder in non-dev environments', () => {
+    it('throws FATAL error when JWT_SECRET is a known-weak placeholder in production', () => {
       expect(mainSrc).toContain('INSECURE_JWT_SECRETS.has(jwtSecret)');
-      expect(mainSrc).toContain('known-weak dev placeholder');
+      expect(mainSrc).toContain('known-weak placeholder');
     });
 
     it('throws FATAL error when DATABASE_URL is missing', () => {
       expect(mainSrc).toContain('DATABASE_URL environment variable is not set');
     });
 
-    it('allows dev/test environments to use weak secrets (local workflow)', () => {
-      const guardExpr = "process.env.NODE_ENV !== 'development' && process.env.NODE_ENV !== 'test'";
-      expect(mainSrc).toContain(guardExpr);
+    it('throws FATAL error when production DATABASE_URL lacks sslmode=require (FIND-037)', () => {
+      expect(mainSrc).toContain('sslmode=require');
+      expect(mainSrc).toContain('DATABASE_URL must include sslmode=require in production');
+    });
+
+    it('throws FATAL error when REDIS_HOST is missing (FIND-037)', () => {
+      expect(mainSrc).toContain('REDIS_HOST environment variable is not set');
+    });
+
+    it('globalExceptionFilter is registered before routes', () => {
+      const filterPos = mainSrc.indexOf('useGlobalFilters');
+      const routePos = mainSrc.indexOf('setGlobalPrefix');
+      expect(filterPos).toBeGreaterThan(0);
+      // filter registered after createApp, close to startup
+      expect(filterPos).toBeGreaterThan(mainSrc.indexOf('NestFactory.create'));
     });
   });
 

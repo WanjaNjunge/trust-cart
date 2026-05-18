@@ -18,20 +18,37 @@ const INSECURE_JWT_SECRETS = new Set([
 async function bootstrap(): Promise<void> {
   const logger = new Logger('Bootstrap');
 
-  // Startup validation — fail fast on missing or insecure secrets (FIND-036, FIND-037 partial)
+  // Startup validation — fail fast on missing or insecure configuration (FIND-036, FIND-037)
+  const isProduction = process.env.NODE_ENV === 'production';
+  const isTest = process.env.NODE_ENV === 'test';
+
   const jwtSecret = process.env.JWT_SECRET;
   if (!jwtSecret) {
     throw new Error('FATAL: JWT_SECRET environment variable is not set');
   }
-  if (process.env.NODE_ENV !== 'development' && process.env.NODE_ENV !== 'test') {
+  if (!isProduction && !isTest) {
+    // development — weak secrets allowed locally
+  } else if (isProduction) {
     if (INSECURE_JWT_SECRETS.has(jwtSecret) || jwtSecret.length < 32) {
       throw new Error(
-        'FATAL: JWT_SECRET is a known-weak dev placeholder. Generate a strong secret before deploying.',
+        'FATAL: JWT_SECRET is a known-weak placeholder. Generate a strong secret before deploying.',
       );
     }
   }
-  if (!process.env.DATABASE_URL) {
+
+  const databaseUrl = process.env.DATABASE_URL;
+  if (!databaseUrl) {
     throw new Error('FATAL: DATABASE_URL environment variable is not set');
+  }
+  // Enforce encrypted connections in production (FIND-026 partial — see docs/security/database-tls.md)
+  if (isProduction && !databaseUrl.includes('sslmode=require')) {
+    throw new Error(
+      'FATAL: DATABASE_URL must include sslmode=require in production. See docs/security/database-tls.md',
+    );
+  }
+
+  if (!process.env.REDIS_HOST) {
+    throw new Error('FATAL: REDIS_HOST environment variable is not set');
   }
 
   const app = await NestFactory.create(AppModule);
